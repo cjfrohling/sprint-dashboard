@@ -48,6 +48,13 @@
       font-size: 0.8rem;
       margin-bottom: 0.5rem;
     }
+    .last-refreshed {
+      font-size: 0.72rem;
+      color: #a8d0e6;
+      opacity: 0.7;
+      margin-top: 0.4rem;
+      letter-spacing: 0.2px;
+    }
     .mountain-svg {
       display: block;
       width: 100%;
@@ -304,6 +311,7 @@
     <h1>⛰️ Trail Status Dashboard</h1>
     <p class="subtitle">Web Programs Development &middot; June 02, 2026 &middot; opentexthq.atlassian.net</p>
     <span class="badge">🏕️ Current Sprint Only &middot; WPD</span>
+    <p class="last-refreshed">🔄 Last refreshed: <span id="last-refreshed"></span></p>
   </div>
   <svg class="mountain-svg" viewBox="0 0 1440 120" preserveAspectRatio="none">
     <path d="M0,90 L80,60 L150,80 L250,30 L340,70 L420,20 L500,60 L580,40 L660,75 L740,10 L820,55 L900,35 L980,65 L1060,15 L1140,50 L1220,30 L1320,70 L1440,40 L1440,120 L0,120 Z" fill="#1a3a5c" opacity="0.6"/>
@@ -751,5 +759,14 @@
 <!-- Footer -->
 <footer>⛰️ Trail Status Dashboard &middot; Current Sprint &middot; WPD &middot; Time logged: last business day &middot; Generated 2026-06-02 23:14 MDT</footer>
 
+<script>
+  const el = document.getElementById('last-refreshed');
+  const now = new Date();
+  el.textContent = now.toLocaleString('en-CA', {
+    year: 'numeric', month: 'short', day: 'numeric',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false, timeZoneName: 'short'
+  });
+</script>
 </body>
 </html>
