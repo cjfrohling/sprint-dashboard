@@ -48,11 +48,9 @@
     /* BOARD */
     .board {
       padding: 22px 20px; display: grid;
-      grid-template-columns: repeat(4, 1fr); gap: 18px;
-      max-width: 1700px; margin: 0 auto;
+      grid-template-columns: repeat(10, minmax(205px, 1fr)); gap: 12px;
+      min-width: 1900px;
     }
-    @media (max-width: 1150px) { .board { grid-template-columns: repeat(2,1fr); } }
-    @media (max-width: 640px)  { .board { grid-template-columns: 1fr; } }
 
     .column { display: flex; flex-direction: column; }
     .col-header {
@@ -75,6 +73,17 @@
     .col-qa .col-header          { background: #d68910; }
     .col-qa .col-body            { border-color: #e8a838; }
     .col-ready .col-header       { background: #1e8449; }
+    .c-ux  { color: #ce93d8; } .c-dr  { color: #4dd0e1; }
+    .c-ddr { color: #80deea; } .c-cr  { color: #ffb74d; }
+    .c-rfqa{ color: #aed581; } .c-qaf { color: #ef9a9a; }
+    .col-ux  .col-header { background: #6a1b9a; } .col-ux  .col-body { border-color: #ce93d8; }
+    .col-dr  .col-header { background: #00838f; } .col-dr  .col-body { border-color: #4dd0e1; }
+    .col-ddr .col-header { background: #006064; } .col-ddr .col-body { border-color: #80deea; }
+    .col-cr  .col-header { background: #e65100; } .col-cr  .col-body { border-color: #ffb74d; }
+    .col-rfqa .col-header{ background: #558b2f; } .col-rfqa .col-body{ border-color: #aed581; }
+    .col-qaf .col-header { background: #b71c1c; } .col-qaf .col-body { border-color: #ef9a9a; }
+    .board-wrap { overflow-x: auto; }
+
     .col-ready .col-body         { border-color: #81c784; }
 
     /* CARDS */
@@ -186,6 +195,18 @@
   <!-- STATS BAR -->
   <div class="stats-bar">
     <div class="stat-box">
+      <div class="count c-ux">4</div>
+      <div class="label">🎨 UX In Progress</div>
+    </div>
+    <div class="stat-box">
+      <div class="count c-dr">1</div>
+      <div class="label">🖌️ Design Review</div>
+    </div>
+    <div class="stat-box">
+      <div class="count c-ddr">3</div>
+      <div class="label">👀 Dev Design Review</div>
+    </div>
+    <div class="stat-box">
       <div class="count c-ip">19</div>
       <div class="label">&#x1F97E; In Progress</div>
     </div>
@@ -198,13 +219,51 @@
       <div class="label">&#x1F52D; QA In Progress</div>
     </div>
     <div class="stat-box">
+      <div class="count c-cr">0</div>
+      <div class="label">🔍 Code Review</div>
+    </div>
+    <div class="stat-box">
+      <div class="count c-rfqa">0</div>
+      <div class="label">📋 Ready for QA</div>
+    </div>
+    <div class="stat-box">
+      <div class="count c-qaf">0</div>
+      <div class="label">❌ QA Failed</div>
+    </div>
+    <div class="stat-box">
       <div class="count c-rp">0</div>
       <div class="label">&#x1F3D4;&#xFE0F; Ready for Prod</div>
     </div>
   </div>
 
-  <!-- BOARD -->
-  <div class="board">
+<div class="board-wrap"><div class="board">
+      <!-- UX In Progress -->
+      <div class="column col-ux">
+        <div class="col-header"><span>🎨 UX In Progress</span><span class="col-count">4</span></div>
+        <div class="col-body">
+        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4265" target="_blank" rel="noopener">WPD-4265</a></div><div class="card-summary">Getting to know Claude</div><div class="card-meta"><div class="avatar" style="background:#ab47bc" title="Gustavo Polo">GP</div><span class="assignee-name">Gustavo Polo</span><span class="priority-badge" style="background:#c62828">Highest</span></div></div>
+        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4264" target="_blank" rel="noopener">WPD-4264</a></div><div class="card-summary">Getting to know Claude</div><div class="card-meta"><div class="avatar" style="background:#26a69a" title="Patrick Galego">PG</div><span class="assignee-name">Patrick Galego</span><span class="priority-badge" style="background:#c62828">Highest</span></div></div>
+        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4274" target="_blank" rel="noopener">WPD-4274</a></div><div class="card-summary">Products Prototype</div><div class="card-meta"><div class="avatar" style="background:#26a69a" title="Patrick Galego">PG</div><span class="assignee-name">Patrick Galego</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
+        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4273" target="_blank" rel="noopener">WPD-4273</a></div><div class="card-summary">Products Prototype</div><div class="card-meta"><div class="avatar" style="background:#ab47bc" title="Gustavo Polo">GP</div><span class="assignee-name">Gustavo Polo</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
+        </div>
+      </div>
+      <!-- Design Review -->
+      <div class="column col-dr">
+        <div class="col-header"><span>🖌️ Design Review</span><span class="col-count">1</span></div>
+        <div class="col-body">
+        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4204" target="_blank" rel="noopener">WPD-4204</a></div><div class="card-summary">[UX] Activate Parent Page Template</div><div class="card-meta"><div class="avatar" style="background:#ab47bc" title="Gustavo Polo">GP</div><span class="assignee-name">Gustavo Polo</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
+        </div>
+      </div>
+      <!-- Dev Design Review -->
+      <div class="column col-ddr">
+        <div class="col-header"><span>👀 Dev Design Review</span><span class="col-count">3</span></div>
+        <div class="col-body">
+        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4282" target="_blank" rel="noopener">WPD-4282</a></div><div class="card-summary">[FE] (C19 Update) Marquee update from feedback from James</div><div class="card-meta"><div class="avatar" style="background:#ab47bc" title="Gustavo Polo">GP</div><span class="assignee-name">Gustavo Polo</span><span class="priority-badge" style="background:#c62828">Highest</span></div></div>
+        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4198" target="_blank" rel="noopener">WPD-4198</a></div><div class="card-summary">[FE][BP2] Add carousel component</div><div class="card-meta"><div class="avatar" style="background:#ab47bc" title="Gustavo Polo">GP</div><span class="assignee-name">Gustavo Polo</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
+        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4195" target="_blank" rel="noopener">WPD-4195</a></div><div class="card-summary">[FE][BP2] Add alert component</div><div class="card-meta"><div class="avatar" style="background:#5c6bc0" title="Nick Karch">NK</div><span class="assignee-name">Nick Karch</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
+        </div>
+      </div>
+
       <div class="column col-in-progress">
         <div class="col-header">
           <span>🥾 In Progress</span>
@@ -384,6 +443,11 @@
         </div>
         </div>
       </div>
+      <!-- Code Review -->
+      <div class="column col-cr">
+        <div class="col-header"><span>🔍 Code Review</span><span class="col-count">0</span></div>
+        <div class="col-body"><div class="empty-col">🌨️ Clear</div></div>
+      </div>
       <div class="column col-blocked">
         <div class="col-header">
           <span>🪨 Blocked</span>
@@ -509,6 +573,11 @@
         </div>
         </div>
       </div>
+      <!-- Ready for QA -->
+      <div class="column col-rfqa">
+        <div class="col-header"><span>📋 Ready for QA</span><span class="col-count">0</span></div>
+        <div class="col-body"><div class="empty-col">🌨️ Clear</div></div>
+      </div>
       <div class="column col-qa">
         <div class="col-header">
           <span>🔭 QA In Progress</span>
@@ -535,6 +604,11 @@
         </div>
         </div>
       </div>
+      <!-- QA Failed -->
+      <div class="column col-qaf">
+        <div class="col-header"><span>❌ QA Failed</span><span class="col-count">0</span></div>
+        <div class="col-body"><div class="empty-col">🌨️ Clear</div></div>
+      </div>
       <div class="column col-ready">
         <div class="col-header">
           <span>🏔️ Ready for Prod</span>
@@ -544,7 +618,7 @@
         <div class="empty-col">🌨️ The summit is clear. No tickets waiting for production.</div>
         </div>
       </div>
-  </div>
+  </div></div>
 
   <!-- WORKLOG -->
   <div class="worklog-section">
