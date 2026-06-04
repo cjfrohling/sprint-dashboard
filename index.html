@@ -1,769 +1,696 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>&#x26F0;&#xFE0F; Sprint Status Dashboard &mdash; WPD</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #1a2f3a;
-      color: #d4e3ec;
-      min-height: 100vh;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>⛰️ Sprint Status Dashboard — WPD</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0d1b2a;color:#e0e8f0;min-height:100vh}
 
-    /* HERO */
-    .hero {
-      background: linear-gradient(135deg, #0d1b2a 0%, #1a3a5c 40%, #2d5a8e 75%, #3d7a9e 100%);
-      position: relative;
-      overflow: hidden;
-      padding: 44px 32px 0;
-      text-align: center;
-    }
-    .hero-content { position: relative; z-index: 1; padding-bottom: 12px; }
-    .hero h1 { font-size: 2.5rem; font-weight: 700; color: #e8f4f8; letter-spacing: -0.5px; }
-    .hero .subtitle { color: #a8d0e6; margin-top: 8px; font-size: 0.95rem; }
-    .last-refreshed { font-size: 0.72rem; color: #a8d0e6; opacity: 0.65; margin-top: 6px; letter-spacing: 0.2px; }
-    .hero .badge {
-      display: inline-block; margin-top: 12px; padding: 4px 16px;
-      background: rgba(168,208,230,0.15); border: 1px solid rgba(168,208,230,0.35);
-      border-radius: 20px; color: #a8d0e6; font-size: 0.8rem;
-    }
-    .hero svg { display: block; width: 100%; margin-top: -8px; }
+/* Hero */
+.hero{background:linear-gradient(135deg,#0d1b2a 0%,#1a3a5c 33%,#2d5a8e 66%,#3d7a9e 100%);padding:32px 24px 0;text-align:center}
+.hero-title{font-size:2.2rem;font-weight:800;letter-spacing:-.5px;margin-bottom:6px}
+.hero-sub{font-size:.95rem;color:#90b8d8;margin-bottom:10px}
+.hero-badge{display:inline-block;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:4px 14px;font-size:.8rem;color:#b0d4f1;margin-bottom:8px}
+.hero-refresh{font-size:.8rem;color:#7aadcc;margin-bottom:6px}
+.hero-refresh span{color:#90caf9;font-weight:600}
 
-    /* STATS BAR */
-    .stats-bar {
-      background: #2d4a5e; padding: 14px 32px;
-      display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
-    }
-    .stat-box {
-      text-align: center; padding: 12px 28px;
-      background: rgba(0,0,0,0.25); border-radius: 8px; min-width: 130px;
-    }
-    .stat-box .count { font-size: 2.1rem; font-weight: 700; line-height: 1; }
-    .stat-box .label { font-size: 0.77rem; color: #8b9ba8; margin-top: 4px; }
-    .c-ip { color: #5b8fa8; } .c-bl { color: #e57373; }
-    .c-qa { color: #e8a838; } .c-rp { color: #81c784; }
+/* Stats */
+.stats-bar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;background:#111f2e;padding:12px 16px;border-bottom:1px solid #1e3a55}
+.stat-box{background:#162535;border-radius:8px;padding:10px 14px;text-align:center;min-width:110px;flex:1 1 100px}
+.stat-num{font-size:1.8rem;font-weight:800;line-height:1}
+.stat-label{font-size:.7rem;color:#90b8d8;margin-top:3px;white-space:nowrap}
 
-    /* BOARD */
-    .board {
-      padding: 22px 20px; display: grid;
-      grid-template-columns: repeat(10, minmax(205px, 1fr)); gap: 12px;
-      min-width: 1900px;
-    }
+/* Board */
+.board-wrap{overflow-x:auto;padding:16px}
+.board{display:grid;min-width:1900px;grid-template-columns:repeat(10,minmax(205px,1fr));gap:10px}
+.col{background:#0f1e2d;border-radius:8px;overflow:hidden}
+.col-header{display:flex;align-items:center;gap:6px;padding:8px 10px;font-size:.8rem;font-weight:700;color:#fff}
+.col-emoji{font-size:1rem}
+.col-title{flex:1}
+.col-count{background:rgba(0,0,0,.3);border-radius:10px;padding:2px 7px;font-size:.75rem}
+.col-body{padding:8px;max-height:600px;overflow-y:auto}
+.empty-col{text-align:center;padding:24px 8px;color:#4a6a88;font-size:.85rem}
 
-    .column { display: flex; flex-direction: column; }
-    .col-header {
-      padding: 10px 14px; border-radius: 8px 8px 0 0;
-      font-weight: 600; font-size: 0.84rem;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .col-count {
-      background: rgba(255,255,255,0.22); border-radius: 12px;
-      padding: 1px 9px; font-size: 0.73rem;
-    }
-    .col-body {
-      border: 2px solid; border-top: none;
-      border-radius: 0 0 8px 8px; overflow: hidden; flex: 1;
-    }
-    .col-in-progress .col-header { background: #2471a3; }
-    .col-in-progress .col-body   { border-color: #5b8fa8; }
-    .col-blocked .col-header     { background: #c0392b; }
-    .col-blocked .col-body       { border-color: #e57373; }
-    .col-qa .col-header          { background: #d68910; }
-    .col-qa .col-body            { border-color: #e8a838; }
-    .col-ready .col-header       { background: #1e8449; }
-    .c-ux  { color: #ce93d8; } .c-dr  { color: #4dd0e1; }
-    .c-ddr { color: #80deea; } .c-cr  { color: #ffb74d; }
-    .c-rfqa{ color: #aed581; } .c-qaf { color: #ef9a9a; }
-    .col-ux  .col-header { background: #6a1b9a; } .col-ux  .col-body { border-color: #ce93d8; }
-    .col-dr  .col-header { background: #00838f; } .col-dr  .col-body { border-color: #4dd0e1; }
-    .col-ddr .col-header { background: #006064; } .col-ddr .col-body { border-color: #80deea; }
-    .col-cr  .col-header { background: #e65100; } .col-cr  .col-body { border-color: #ffb74d; }
-    .col-rfqa .col-header{ background: #558b2f; } .col-rfqa .col-body{ border-color: #aed581; }
-    .col-qaf .col-header { background: #b71c1c; } .col-qaf .col-body { border-color: #ef9a9a; }
-    .board-wrap { overflow-x: auto; }
+/* Ticket card */
+.ticket-card{background:#162535;border:1px solid #1e3a55;border-radius:6px;padding:8px 10px;margin-bottom:7px}
+.ticket-key a{font-size:.72rem;font-weight:700;color:#64b5f6;text-decoration:none}
+.ticket-key a:hover{text-decoration:underline}
+.ticket-summary{font-size:.78rem;color:#c9dde8;margin:4px 0;line-height:1.3}
+.ticket-footer{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#fff;flex-shrink:0;cursor:default}
+.priority-badge{font-size:.65rem;padding:2px 7px;border-radius:10px;font-weight:600}
 
-    .col-ready .col-body         { border-color: #81c784; }
+/* Worklog */
+.worklog-section{max-width:1400px;margin:16px auto;padding:0 16px}
+.worklog-header{font-size:1.05rem;font-weight:700;color:#81c784;margin-bottom:10px;padding-left:4px}
+.worklog-empty{color:#4a6a88;font-size:.85rem;padding:12px}
+.wl-grid{display:flex;flex-wrap:wrap;gap:10px}
+.wl-card{background:#0f1e2d;border:1px solid #1e3a55;border-radius:8px;padding:12px;min-width:280px;flex:1 1 260px}
+.wl-person{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.wl-name{font-weight:700;font-size:.85rem;color:#c9dde8}
+.wl-entries{font-size:.78rem}
+.wl-entry{margin-bottom:5px;line-height:1.4}
+.wl-entry a{color:#64b5f6;font-weight:700;text-decoration:none}
+.wl-entry a:hover{text-decoration:underline}
+.wl-time{background:#1e3a55;color:#90caf9;border-radius:4px;padding:1px 5px;font-weight:700;margin:0 4px}
+.wl-summary{color:#90b8d8}
 
-    /* CARDS */
-    .card {
-      padding: 9px 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      background: #1e3545; transition: background 0.15s;
-    }
-    .card:last-child { border-bottom: none; }
-    .card:hover { background: #253f52; }
-    .card-key a {
-      color: #a8d0e6; text-decoration: none;
-      font-size: 0.74rem; font-weight: 600;
-    }
-    .card-key a:hover { text-decoration: underline; }
-    .card-summary { color: #c8dde8; font-size: 0.81rem; margin: 3px 0 0; line-height: 1.35; }
-    .card-meta {
-      display: flex; align-items: center; gap: 5px;
-      margin-top: 7px; flex-wrap: wrap;
-    }
-    .avatar {
-      width: 18px; height: 18px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.54rem; font-weight: 700; color: #fff; flex-shrink: 0;
-    }
-    .assignee-name { font-size: 0.71rem; color: #8b9ba8; }
-    .priority-badge {
-      font-size: 0.64rem; font-weight: 600; padding: 1px 6px;
-      border-radius: 3px; color: #fff; margin-left: auto;
-    }
-    .empty-col {
-      padding: 24px 14px; text-align: center;
-      color: #8b9ba8; font-size: 0.82rem; font-style: italic;
-      background: #1e3545;
-    }
-
-    /* WORKLOG */
-    .worklog-section {
-      max-width: 1700px; margin: 6px auto 28px; padding: 0 20px;
-    }
-    .worklog-header {
-      background: #2e5944; padding: 12px 18px;
-      border-radius: 8px 8px 0 0;
-      font-weight: 600; font-size: 0.88rem; color: #a8d8b0;
-    }
-    .worklog-body {
-      background: #1e3545; border: 2px solid #2e5944;
-      border-top: none; border-radius: 0 0 8px 8px; padding: 16px;
-    }
-    .worklog-grid {
-      display: flex; flex-wrap: wrap; gap: 14px;
-    }
-    .worklog-person {
-      flex: 1 1 310px; background: #243e50;
-      border-radius: 8px; overflow: hidden;
-    }
-    .worklog-person-header {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 14px; background: rgba(0,0,0,0.18);
-      border-bottom: 1px solid rgba(255,255,255,0.07);
-    }
-    .worklog-avatar {
-      width: 28px; height: 28px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.68rem; font-weight: 700; color: #fff;
-    }
-    .worklog-person-name { font-weight: 600; font-size: 0.84rem; color: #c8dde8; }
-    .worklog-entries { padding: 4px 0; }
-    .worklog-entry {
-      display: grid; grid-template-columns: 88px 1fr 68px;
-      gap: 8px; padding: 6px 14px;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      align-items: start;
-    }
-    .worklog-entry:last-child { border-bottom: none; }
-    .worklog-key a {
-      color: #a8d0e6; text-decoration: none;
-      font-size: 0.73rem; font-weight: 600;
-    }
-    .worklog-key a:hover { text-decoration: underline; }
-    .worklog-summary { font-size: 0.77rem; color: #8b9ba8; line-height: 1.3; }
-    .worklog-time { font-size: 0.74rem; color: #c9a86c; font-weight: 600; text-align: right; }
-    .no-worklog { padding: 20px; text-align: center; color: #8b9ba8; font-style: italic; }
-
-    /* FOOTER */
-    footer {
-      text-align: center; padding: 16px;
-      color: #8b9ba8; font-size: 0.74rem;
-      border-top: 1px solid #2d4a5e; margin-top: 8px;
-    }
-  </style>
+/* Footer */
+footer{text-align:center;padding:18px;font-size:.75rem;color:#4a6a88;border-top:1px solid #1e3a55;margin-top:24px}
+</style>
 </head>
 <body>
 
-  <!-- HERO -->
-  <header class="hero">
-    <div class="hero-content">
-      <h1>&#x26F0;&#xFE0F; Sprint Status Dashboard</h1>
-      <div class="subtitle">Web Programs Development &middot; June 03, 2026 &middot; opentexthq.atlassian.net</div>
-      <span class="badge">&#x1F3D5;&#xFE0F; Current Sprint Only &middot; WPD</span>
-      <div class="last-refreshed">&#x1F504; Last refreshed: <span id="last-refreshed"></span></div>
-    </div>
-    <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
-      <path d="M0,90 L80,60 L150,80 L250,30 L340,70 L420,20 L500,60 L580,40 L660,75 L740,10 L820,55 L900,35 L980,65 L1060,15 L1140,50 L1220,30 L1320,70 L1440,40 L1440,120 L0,120 Z" fill="#1a3a5c" opacity="0.6"/>
-      <path d="M0,110 L60,85 L120,100 L200,60 L280,95 L380,50 L460,80 L520,65 L620,95 L700,40 L800,75 L880,55 L960,90 L1040,45 L1140,80 L1220,55 L1320,85 L1440,65 L1440,120 L0,120 Z" fill="#152535"/>
-      <path d="M700,40 L720,18 L740,40 Z" fill="#fff" opacity="0.9"/>
-    </svg>
-  </header>
+<header class="hero">
+  <div class="hero-title">⛰️ Sprint Status Dashboard</div>
+  <div class="hero-sub">Web Programs Development &middot; June 04, 2026 &middot; opentexthq.atlassian.net</div>
+  <div class="hero-badge">🏕️ Current Sprint Only &middot; WPD</div>
+  <div class="hero-refresh">🔄 Last refreshed: <span id="last-refreshed"></span></div>
+  <svg viewBox="0 0 1440 120" preserveAspectRatio="none" style="display:block;width:100%;height:80px">
+    <path d="M0,90 L80,60 L150,80 L250,30 L340,70 L420,20 L500,60 L580,40 L660,75 L740,10 L820,55 L900,35 L980,65 L1060,15 L1140,50 L1220,30 L1320,70 L1440,40 L1440,120 L0,120 Z" fill="#1a3a5c" opacity="0.6"/>
+    <path d="M0,110 L60,85 L120,100 L200,60 L280,95 L380,50 L460,80 L520,65 L620,95 L700,40 L800,75 L880,55 L960,90 L1040,45 L1140,80 L1220,55 L1320,85 L1440,65 L1440,120 L0,120 Z" fill="#152535"/>
+    <path d="M700,40 L720,18 L740,40 Z" fill="#fff" opacity="0.9"/>
+  </svg>
+</header>
 
-  <!-- STATS BAR -->
-  <div class="stats-bar">
-    <div class="stat-box">
-      <div class="count c-ux">4</div>
-      <div class="label">🎨 UX In Progress</div>
-    </div>
-    <div class="stat-box">
-      <div class="count c-dr">1</div>
-      <div class="label">🖌️ Design Review</div>
-    </div>
-    <div class="stat-box">
-      <div class="count c-ddr">3</div>
-      <div class="label">👀 Dev Design Review</div>
-    </div>
-    <div class="stat-box">
-      <div class="count c-ip">19</div>
-      <div class="label">&#x1F97E; In Progress</div>
-    </div>
-    <div class="stat-box">
-      <div class="count c-bl">13</div>
-      <div class="label">&#x1FAA8; Blocked</div>
-    </div>
-    <div class="stat-box">
-      <div class="count c-qa">2</div>
-      <div class="label">&#x1F52D; QA In Progress</div>
-    </div>
-    <div class="stat-box">
-      <div class="count c-cr">0</div>
-      <div class="label">🔍 Code Review</div>
-    </div>
-    <div class="stat-box">
-      <div class="count c-rfqa">0</div>
-      <div class="label">📋 Ready for QA</div>
-    </div>
-    <div class="stat-box">
-      <div class="count c-qaf">0</div>
-      <div class="label">❌ QA Failed</div>
-    </div>
-    <div class="stat-box">
-      <div class="count c-rp">15</div>
-      <div class="label">&#x1F3D4;&#xFE0F; Ready for Prod</div>
-    </div>
+<div class="stats-bar">
+<div class="stat-box" style="border-bottom:3px solid #6a1b9a"><div class="stat-num" style="color:#6a1b9a">4</div><div class="stat-label">🎨 UX In Progress</div></div>
+<div class="stat-box" style="border-bottom:3px solid #00838f"><div class="stat-num" style="color:#00838f">1</div><div class="stat-label">🖌️ Design Review</div></div>
+<div class="stat-box" style="border-bottom:3px solid #006064"><div class="stat-num" style="color:#006064">3</div><div class="stat-label">👀 Dev Design Review</div></div>
+<div class="stat-box" style="border-bottom:3px solid #2471a3"><div class="stat-num" style="color:#2471a3">24</div><div class="stat-label">🥾 In Progress</div></div>
+<div class="stat-box" style="border-bottom:3px solid #e65100"><div class="stat-num" style="color:#e65100">0</div><div class="stat-label">🔍 Code Review</div></div>
+<div class="stat-box" style="border-bottom:3px solid #c0392b"><div class="stat-num" style="color:#c0392b">8</div><div class="stat-label">🪨 Blocked</div></div>
+<div class="stat-box" style="border-bottom:3px solid #558b2f"><div class="stat-num" style="color:#558b2f">0</div><div class="stat-label">📋 Ready for QA</div></div>
+<div class="stat-box" style="border-bottom:3px solid #d68910"><div class="stat-num" style="color:#d68910">2</div><div class="stat-label">🔭 QA In Progress</div></div>
+<div class="stat-box" style="border-bottom:3px solid #b71c1c"><div class="stat-num" style="color:#b71c1c">0</div><div class="stat-label">❌ QA Failed</div></div>
+<div class="stat-box" style="border-bottom:3px solid #1e8449"><div class="stat-num" style="color:#1e8449">15</div><div class="stat-label">🏔️ Ready for Prod</div></div>
+
+</div>
+
+<div class="board-wrap">
+  <div class="board">
+<div class="col col-ux" style="border-top:3px solid #ce93d8">
+  <div class="col-header" style="background:#6a1b9a">
+    <span class="col-emoji">🎨</span>
+    <span class="col-title">UX In Progress</span>
+    <span class="col-count">4</span>
   </div>
-
-<div class="board-wrap"><div class="board">
-      <!-- UX In Progress -->
-      <div class="column col-ux">
-        <div class="col-header"><span>🎨 UX In Progress</span><span class="col-count">4</span></div>
-        <div class="col-body">
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4265" target="_blank" rel="noopener">WPD-4265</a></div><div class="card-summary">Getting to know Claude</div><div class="card-meta"><div class="avatar" style="background:#ab47bc" title="Gustavo Polo">GP</div><span class="assignee-name">Gustavo Polo</span><span class="priority-badge" style="background:#c62828">Highest</span></div></div>
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4264" target="_blank" rel="noopener">WPD-4264</a></div><div class="card-summary">Getting to know Claude</div><div class="card-meta"><div class="avatar" style="background:#26a69a" title="Patrick Galego">PG</div><span class="assignee-name">Patrick Galego</span><span class="priority-badge" style="background:#c62828">Highest</span></div></div>
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4274" target="_blank" rel="noopener">WPD-4274</a></div><div class="card-summary">Products Prototype</div><div class="card-meta"><div class="avatar" style="background:#26a69a" title="Patrick Galego">PG</div><span class="assignee-name">Patrick Galego</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4273" target="_blank" rel="noopener">WPD-4273</a></div><div class="card-summary">Products Prototype</div><div class="card-meta"><div class="avatar" style="background:#ab47bc" title="Gustavo Polo">GP</div><span class="assignee-name">Gustavo Polo</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
-        </div>
-      </div>
-      <!-- Design Review -->
-      <div class="column col-dr">
-        <div class="col-header"><span>🖌️ Design Review</span><span class="col-count">1</span></div>
-        <div class="col-body">
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4204" target="_blank" rel="noopener">WPD-4204</a></div><div class="card-summary">[UX] Activate Parent Page Template</div><div class="card-meta"><div class="avatar" style="background:#ab47bc" title="Gustavo Polo">GP</div><span class="assignee-name">Gustavo Polo</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
-        </div>
-      </div>
-      <!-- Dev Design Review -->
-      <div class="column col-ddr">
-        <div class="col-header"><span>👀 Dev Design Review</span><span class="col-count">3</span></div>
-        <div class="col-body">
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4282" target="_blank" rel="noopener">WPD-4282</a></div><div class="card-summary">[FE] (C19 Update) Marquee update from feedback from James</div><div class="card-meta"><div class="avatar" style="background:#ab47bc" title="Gustavo Polo">GP</div><span class="assignee-name">Gustavo Polo</span><span class="priority-badge" style="background:#c62828">Highest</span></div></div>
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4198" target="_blank" rel="noopener">WPD-4198</a></div><div class="card-summary">[FE][BP2] Add carousel component</div><div class="card-meta"><div class="avatar" style="background:#ab47bc" title="Gustavo Polo">GP</div><span class="assignee-name">Gustavo Polo</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4195" target="_blank" rel="noopener">WPD-4195</a></div><div class="card-summary">[FE][BP2] Add alert component</div><div class="card-meta"><div class="avatar" style="background:#5c6bc0" title="Nick Karch">NK</div><span class="assignee-name">Nick Karch</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
-        </div>
-      </div>
-
-      <div class="column col-in-progress">
-        <div class="col-header">
-          <span>🥾 In Progress</span>
-          <span class="col-count">19</span>
-        </div>
-        <div class="col-body">
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4267" target="_blank" rel="noopener">WPD-4267</a></div>
-          <div class="card-summary">Getting to know Claude</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#5c6bc0" title="Ganesh Abothula">GA</div>
-            <span class="assignee-name">Ganesh Abothula</span>
-            <span class="priority-badge" style="background:#c62828">Highest</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4291" target="_blank" rel="noopener">WPD-4291</a></div>
-          <div class="card-summary">[APPS][ot.digital] Enablement Web CMS: multi-asset catalog (videos + docs) on enablement.ot.digital</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#26a69a" title="Nageswara Rao Recharla">NR</div>
-            <span class="assignee-name">Nageswara Rao Recharla</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4266" target="_blank" rel="noopener">WPD-4266</a></div>
-          <div class="card-summary">Getting to know Claude</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#ef5350" title="Lenin johnson">LJ</div>
-            <span class="assignee-name">Lenin johnson</span>
-            <span class="priority-badge" style="background:#c62828">Highest</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4148" target="_blank" rel="noopener">WPD-4148</a></div>
-          <div class="card-summary">[Apps] - Kadence Pro/Ultimate installation/configuration</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#ef5350" title="Lenin johnson">LJ</div>
-            <span class="assignee-name">Lenin johnson</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3564" target="_blank" rel="noopener">WPD-3564</a></div>
-          <div class="card-summary">[FE][BP2] Table Component</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#ff7043" title="Chris Schultz">CS</div>
-            <span class="assignee-name">Chris Schultz</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4262" target="_blank" rel="noopener">WPD-4262</a></div>
-          <div class="card-summary">Getting to know Claude</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#ff7043" title="Chris Schultz">CS</div>
-            <span class="assignee-name">Chris Schultz</span>
-            <span class="priority-badge" style="background:#c62828">Highest</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3747" target="_blank" rel="noopener">WPD-3747</a></div>
-          <div class="card-summary">[FE] Update Language alert and gtm alert to work with BP2</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#66bb6a" title="Nick Karch">NK</div>
-            <span class="assignee-name">Nick Karch</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3770" target="_blank" rel="noopener">WPD-3770</a></div>
-          <div class="card-summary">Short URL tool — write proposal for ownership migration</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#26a69a" title="Nageswara Rao Recharla">NR</div>
-            <span class="assignee-name">Nageswara Rao Recharla</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4112" target="_blank" rel="noopener">WPD-4112</a></div>
-          <div class="card-summary">[CS Datasource] Align filter and listing components to BluePrint C44.1</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#42a5f5" title="Krishna Kodicherla">KK</div>
-            <span class="assignee-name">Krishna Kodicherla</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3899" target="_blank" rel="noopener">WPD-3899</a></div>
-          <div class="card-summary">[FE][BP2] Apply new color and typography tokens to tooltip component</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#ff7043" title="Chris Schultz">CS</div>
-            <span class="assignee-name">Chris Schultz</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4263" target="_blank" rel="noopener">WPD-4263</a></div>
-          <div class="card-summary">Getting to know Claude</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#66bb6a" title="Nick Karch">NK</div>
-            <span class="assignee-name">Nick Karch</span>
-            <span class="priority-badge" style="background:#c62828">Highest</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4111" target="_blank" rel="noopener">WPD-4111</a></div>
-          <div class="card-summary">[CS Datasource] Develop utility to auto-update feed JSON</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#5c6bc0" title="Ganesh Abothula">GA</div>
-            <span class="assignee-name">Ganesh Abothula</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4269" target="_blank" rel="noopener">WPD-4269</a></div>
-          <div class="card-summary">Getting to know Claude</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#26a69a" title="Nageswara Rao Recharla">NR</div>
-            <span class="assignee-name">Nageswara Rao Recharla</span>
-            <span class="priority-badge" style="background:#c62828">Highest</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3655" target="_blank" rel="noopener">WPD-3655</a></div>
-          <div class="card-summary">[FE] Global Font Change to accommodate for longer translations</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#66bb6a" title="Nick Karch">NK</div>
-            <span class="assignee-name">Nick Karch</span>
-            <span class="priority-badge" style="background:#c62828">Highest</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4113" target="_blank" rel="noopener">WPD-4113</a></div>
-          <div class="card-summary">[CS Datasource] Add Product-to-Cloud mapping</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#42a5f5" title="Krishna Kodicherla">KK</div>
-            <span class="assignee-name">Krishna Kodicherla</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4152" target="_blank" rel="noopener">WPD-4152</a></div>
-          <div class="card-summary">[Wordpress] blogs.opentext.com Plugin Audit &amp; gap analysis</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#ef5350" title="Lenin johnson">LJ</div>
-            <span class="assignee-name">Lenin johnson</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4268" target="_blank" rel="noopener">WPD-4268</a></div>
-          <div class="card-summary">Getting to know Claude</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#42a5f5" title="Krishna Kodicherla">KK</div>
-            <span class="assignee-name">Krishna Kodicherla</span>
-            <span class="priority-badge" style="background:#c62828">Highest</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4191" target="_blank" rel="noopener">WPD-4191</a></div>
-          <div class="card-summary">[QA Env] WPD4072_bug1 Thumbnail image is not removed from demo card</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#42a5f5" title="Krishna Kodicherla">KK</div>
-            <span class="assignee-name">Krishna Kodicherla</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4206" target="_blank" rel="noopener">WPD-4206</a></div>
-          <div class="card-summary">[FE][BP2] Research for Prefixing tailwind classes</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#66bb6a" title="Nick Karch">NK</div>
-            <span class="assignee-name">Nick Karch</span>
-            <span class="priority-badge" style="background:#e64a19">High</span>
-          </div>
-        </div>
-        </div>
-      </div>
-      <!-- Code Review -->
-      <div class="column col-cr">
-        <div class="col-header"><span>🔍 Code Review</span><span class="col-count">0</span></div>
-        <div class="col-body"><div class="empty-col">🌨️ Clear</div></div>
-      </div>
-      <div class="column col-blocked">
-        <div class="col-header">
-          <span>🪨 Blocked</span>
-          <span class="col-count">13</span>
-        </div>
-        <div class="col-body">
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4231" target="_blank" rel="noopener">WPD-4231</a></div>
-          <div class="card-summary">[Blog Rebuild] Kadence Template Implementation - Single Blog Post</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#ef5350" title="Lenin johnson">LJ</div>
-            <span class="assignee-name">Lenin johnson</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4279" target="_blank" rel="noopener">WPD-4279</a></div>
-          <div class="card-summary">[Blog Rebuild] Kadence Template Implementation - Search Results Template</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#ef5350" title="Lenin johnson">LJ</div>
-            <span class="assignee-name">Lenin johnson</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4194" target="_blank" rel="noopener">WPD-4194</a></div>
-          <div class="card-summary">[FE][BP2] Add avatar component</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#ff7043" title="Chris Schultz">CS</div>
-            <span class="assignee-name">Chris Schultz</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4158" target="_blank" rel="noopener">WPD-4158</a></div>
-          <div class="card-summary">[prod-red] WebCMS Upgrade 25.4 | Customers page $LOCAL_NODE_REF console error on Reset, Unchecking filters</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#42a5f5" title="Krishna Kodicherla">KK</div>
-            <span class="assignee-name">Krishna Kodicherla</span>
-            <span class="priority-badge" style="background:#e64a19">High</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3895" target="_blank" rel="noopener">WPD-3895</a></div>
-          <div class="card-summary">[FE][BP2] Apply new color and typography tokens to dropdown component</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#ab47bc" title="Gustavo Polo">GP</div>
-            <span class="assignee-name">Gustavo Polo</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3893" target="_blank" rel="noopener">WPD-3893</a></div>
-          <div class="card-summary">[FE][BP2] Apply new color and typography tokens to card component</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#ab47bc" title="Gustavo Polo">GP</div>
-            <span class="assignee-name">Gustavo Polo</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4233" target="_blank" rel="noopener">WPD-4233</a></div>
-          <div class="card-summary">[Blog Rebuild] Kadence Template Implementation - Authors Directory</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#ef5350" title="Lenin johnson">LJ</div>
-            <span class="assignee-name">Lenin johnson</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4230" target="_blank" rel="noopener">WPD-4230</a></div>
-          <div class="card-summary">[Blog Rebuild] Kadence Template Implementation - Category Pages</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#ef5350" title="Lenin johnson">LJ</div>
-            <span class="assignee-name">Lenin johnson</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4278" target="_blank" rel="noopener">WPD-4278</a></div>
-          <div class="card-summary">[Blog Rebuild] Kadence Template Implementation - Archive Template</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#ef5350" title="Lenin johnson">LJ</div>
-            <span class="assignee-name">Lenin johnson</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4232" target="_blank" rel="noopener">WPD-4232</a></div>
-          <div class="card-summary">[Blog Rebuild] Kadence Template Implementation - Individual Author Page</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#ef5350" title="Lenin johnson">LJ</div>
-            <span class="assignee-name">Lenin johnson</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4257" target="_blank" rel="noopener">WPD-4257</a></div>
-          <div class="card-summary">[WEB CMS] Create new skin for SaaS navigation</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#42a5f5" title="Krishna Kodicherla">KK</div>
-            <span class="assignee-name">Krishna Kodicherla</span>
-            <span class="priority-badge" style="background:#455a64">Medium</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4078" target="_blank" rel="noopener">WPD-4078</a></div>
-          <div class="card-summary">[WEB CMS] New C44.5 Variant</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#5c6bc0" title="Ganesh Abothula">GA</div>
-            <span class="assignee-name">Ganesh Abothula</span>
-            <span class="priority-badge" style="background:#e64a19">High</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3902" target="_blank" rel="noopener">WPD-3902</a></div>
-          <div class="card-summary">[FE] Dynamic Footer + Header</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#66bb6a" title="Nick Karch">NK</div>
-            <span class="assignee-name">Nick Karch</span>
-            <span class="priority-badge" style="background:#e64a19">High</span>
-          </div>
-        </div>
-        </div>
-      </div>
-      <!-- Ready for QA -->
-      <div class="column col-rfqa">
-        <div class="col-header"><span>📋 Ready for QA</span><span class="col-count">0</span></div>
-        <div class="col-body"><div class="empty-col">🌨️ Clear</div></div>
-      </div>
-      <div class="column col-qa">
-        <div class="col-header">
-          <span>🔭 QA In Progress</span>
-          <span class="col-count">2</span>
-        </div>
-        <div class="col-body">
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4270" target="_blank" rel="noopener">WPD-4270</a></div>
-          <div class="card-summary">Getting to know Claude</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#8d6e63" title="Srinivas Jayaram Rao">SR</div>
-            <span class="assignee-name">Srinivas Jayaram Rao</span>
-            <span class="priority-badge" style="background:#c62828">Highest</span>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4271" target="_blank" rel="noopener">WPD-4271</a></div>
-          <div class="card-summary">Getting to know Claude</div>
-          <div class="card-meta">
-            <div class="avatar" style="background:#26c6da" title="Swetha Kalluri">SK</div>
-            <span class="assignee-name">Swetha Kalluri</span>
-            <span class="priority-badge" style="background:#c62828">Highest</span>
-          </div>
-        </div>
-        </div>
-      </div>
-      <!-- QA Failed -->
-      <div class="column col-qaf">
-        <div class="col-header"><span>❌ QA Failed</span><span class="col-count">0</span></div>
-        <div class="col-body"><div class="empty-col">🌨️ Clear</div></div>
-      </div>
-      <div class="column col-ready">
-        <div class="col-header">
-          <span>🏔️ Ready for Prod</span>
-          <span class="col-count">15</span>
-        </div>
-        <div class="col-body" style="max-height:600px;overflow-y:auto">
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4092" target="_blank" rel="noopener">WPD-4092</a></div><div class="card-summary">[FE] Header to be added across all SaaS pages</div><div class="card-meta"><div class="avatar" style="background:#5c6bc0" title="Nick Karch">NK</div><span class="assignee-name">Nick Karch</span><span class="priority-badge" style="background:#c62828">Highest</span></div></div>
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4277" target="_blank" rel="noopener">WPD-4277</a></div><div class="card-summary">DMTH - C38 FAQschema should include both card and secondlevelcard desc</div><div class="card-meta"><div class="avatar" style="background:#42a5f5" title="Ganesh Abothula">GA</div><span class="assignee-name">Ganesh Abothula</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4251" target="_blank" rel="noopener">WPD-4251</a></div><div class="card-summary">FAQ Schema markup for SP07.1</div><div class="card-meta"><div class="avatar" style="background:#ef5350" title="Krishna Kodicherla">KK</div><span class="assignee-name">Krishna Kodicherla</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4250" target="_blank" rel="noopener">WPD-4250</a></div><div class="card-summary">FAQ Schema markup for C38.3</div><div class="card-meta"><div class="avatar" style="background:#ef5350" title="Krishna Kodicherla">KK</div><span class="assignee-name">Krishna Kodicherla</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4247" target="_blank" rel="noopener">WPD-4247</a></div><div class="card-summary">DMTH - FAQ Schema Issues</div><div class="card-meta"><div class="avatar" style="background:#ef5350" title="Krishna Kodicherla">KK</div><span class="assignee-name">Krishna Kodicherla</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4224" target="_blank" rel="noopener">WPD-4224</a></div><div class="card-summary">[QA Env] WPD4040_bug2 Logo Marquee accepts blank values and displays a blank image</div><div class="card-meta"><div class="avatar" style="background:#42a5f5" title="Ganesh Abothula">GA</div><span class="assignee-name">Ganesh Abothula</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4223" target="_blank" rel="noopener">WPD-4223</a></div><div class="card-summary">[QA Env] WPD4040_bug1 Max Char limits not applied to Eyebrow and Heading</div><div class="card-meta"><div class="avatar" style="background:#42a5f5" title="Ganesh Abothula">GA</div><span class="assignee-name">Ganesh Abothula</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4221" target="_blank" rel="noopener">WPD-4221</a></div><div class="card-summary">[Web CMS] Make sure BPV2 templates are available</div><div class="card-meta"><div class="avatar" style="background:#42a5f5" title="Ganesh Abothula">GA</div><span class="assignee-name">Ganesh Abothula</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4178" target="_blank" rel="noopener">WPD-4178</a></div><div class="card-summary">[WEB CMS] Filtering Customer stories by clicking on marquee logo</div><div class="card-meta"><div class="avatar" style="background:#42a5f5" title="Ganesh Abothula">GA</div><span class="assignee-name">Ganesh Abothula</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4169" target="_blank" rel="noopener">WPD-4169</a></div><div class="card-summary">DMTH - [prod-red] WebCMS Upgrade 25.4 | TinyMCE rendering too small in preview</div><div class="card-meta"><div class="avatar" style="background:#ef5350" title="Krishna Kodicherla">KK</div><span class="assignee-name">Krishna Kodicherla</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4118" target="_blank" rel="noopener">WPD-4118</a></div><div class="card-summary">[BE][Prod] Opentext.com - Closing Language Switcher the page scrolls up</div><div class="card-meta"><div class="avatar" style="background:#42a5f5" title="Ganesh Abothula">GA</div><span class="assignee-name">Ganesh Abothula</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4072" target="_blank" rel="noopener">WPD-4072</a></div><div class="card-summary">[WEB CMS] Implementation - Simplify Demo Card Layout &amp; Support YouTube</div><div class="card-meta"><div class="avatar" style="background:#ef5350" title="Krishna Kodicherla">KK</div><span class="assignee-name">Krishna Kodicherla</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4040" target="_blank" rel="noopener">WPD-4040</a></div><div class="card-summary">[WEB CMS] C02.12 Hero Banner [Logo Marquee]</div><div class="card-meta"><div class="avatar" style="background:#42a5f5" title="Ganesh Abothula">GA</div><span class="assignee-name">Ganesh Abothula</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3880" target="_blank" rel="noopener">WPD-3880</a></div><div class="card-summary">[BE] Implement classes &amp; id's to elements to be tracked by GA4</div><div class="card-meta"><div class="avatar" style="background:#ef5350" title="Krishna Kodicherla">KK</div><span class="assignee-name">Krishna Kodicherla</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
-        <div class="card"><div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3240" target="_blank" rel="noopener">WPD-3240</a></div><div class="card-summary">Update DCR Components to Support FAQ Schema Tagging</div><div class="card-meta"><div class="avatar" style="background:#ef5350" title="Krishna Kodicherla">KK</div><span class="assignee-name">Krishna Kodicherla</span><span class="priority-badge" style="background:#455a64">Medium</span></div></div>
-        </div>
-      </div>
-  </div></div>
-
-  <!-- WORKLOG TODAY -->
-  <div class="worklog-section" style="margin-bottom:16px">
-    <div class="worklog-header" style="background:#1e4a6e">&#x1F332; Time Logged &mdash; Today &nbsp;&#x1F4C5; Tuesday, Jun 03 2026</div>
-    <div class="worklog-body">
-      <div class="worklog-grid">
-        <div class="worklog-person">
-          <div class="worklog-person-header">
-            <div class="worklog-avatar" style="background:#42a5f5">GA</div>
-            <span class="worklog-person-name">Ganesh Abothula</span>
-          </div>
-          <div class="worklog-entries">
-            <div class="worklog-entry">
-              <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4267" target="_blank" rel="noopener">WPD-4267</a></div>
-              <div class="worklog-summary">Getting to know Claude</div>
-              <div class="worklog-time">1d</div>
-            </div>
-          </div>
-        </div>
-        <div class="worklog-person">
-          <div class="worklog-person-header">
-            <div class="worklog-avatar" style="background:#26a69a">NR</div>
-            <span class="worklog-person-name">Nageswara Rao Recharla</span>
-          </div>
-          <div class="worklog-entries">
-            <div class="worklog-entry">
-              <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4291" target="_blank" rel="noopener">WPD-4291</a></div>
-              <div class="worklog-summary">[APPS][ot.digital] Enablement Web CMS: multi-asset catalog</div>
-              <div class="worklog-time">1d</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="col-body"><div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4265" target="_blank">WPD-4265</a></div>
+  <div class="ticket-summary">Getting to know Claude</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Gustavo Polo" style="background:#ab47bc">GP</div>
+    <span class="priority-badge" style="background:#ffcdd2;color:#c62828">🔴 Highest</span>
   </div>
-
-  <!-- WORKLOG YESTERDAY -->
-  <div class="worklog-section">
-    <div class="worklog-header">&#x1F332; Time Logged &mdash; Last Business Day &nbsp;&#x1F4C5; Tuesday, Jun 02 2026</div>
-    <div class="worklog-body">
-        <div class="worklog-grid">
-          <div class="worklog-person">
-            <div class="worklog-person-header">
-              <div class="worklog-avatar" style="background:#ef5350">LJ</div>
-              <span class="worklog-person-name">Lenin johnson</span>
-            </div>
-            <div class="worklog-entries">
-              <div class="worklog-entry">
-                <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4266" target="_blank" rel="noopener">WPD-4266</a></div>
-                <div class="worklog-summary">Getting to know Claude</div>
-                <div class="worklog-time">3h</div>
-              </div>
-              <div class="worklog-entry">
-                <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4266" target="_blank" rel="noopener">WPD-4266</a></div>
-                <div class="worklog-summary">Getting to know Claude</div>
-                <div class="worklog-time">1d 1h</div>
-              </div>
-            </div>
-          </div>
-          <div class="worklog-person">
-            <div class="worklog-person-header">
-              <div class="worklog-avatar" style="background:#ff7043">CS</div>
-              <span class="worklog-person-name">Chris Schultz</span>
-            </div>
-            <div class="worklog-entries">
-              <div class="worklog-entry">
-                <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3564" target="_blank" rel="noopener">WPD-3564</a></div>
-                <div class="worklog-summary">[FE][BP2] Table Component</div>
-                <div class="worklog-time">2h</div>
-              </div>
-              <div class="worklog-entry">
-                <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4262" target="_blank" rel="noopener">WPD-4262</a></div>
-                <div class="worklog-summary">Getting to know Claude</div>
-                <div class="worklog-time">1h</div>
-              </div>
-              <div class="worklog-entry">
-                <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4194" target="_blank" rel="noopener">WPD-4194</a></div>
-                <div class="worklog-summary">[FE][BP2] Add avatar component</div>
-                <div class="worklog-time">1h 30m</div>
-              </div>
-            </div>
-          </div>
-          <div class="worklog-person">
-            <div class="worklog-person-header">
-              <div class="worklog-avatar" style="background:#66bb6a">NK</div>
-              <span class="worklog-person-name">Nick Karch</span>
-            </div>
-            <div class="worklog-entries">
-              <div class="worklog-entry">
-                <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3747" target="_blank" rel="noopener">WPD-3747</a></div>
-                <div class="worklog-summary">[FE] Update Language alert and gtm alert to work with BP2</div>
-                <div class="worklog-time">1d 30m</div>
-              </div>
-            </div>
-          </div>
-          <div class="worklog-person">
-            <div class="worklog-person-header">
-              <div class="worklog-avatar" style="background:#5c6bc0">PG</div>
-              <span class="worklog-person-name">Patrick Galego</span>
-            </div>
-            <div class="worklog-entries">
-              <div class="worklog-entry">
-                <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4274" target="_blank" rel="noopener">WPD-4274</a></div>
-                <div class="worklog-summary">Products Prototype</div>
-                <div class="worklog-time">4h</div>
-              </div>
-            </div>
-          </div>
-          <div class="worklog-person">
-            <div class="worklog-person-header">
-              <div class="worklog-avatar" style="background:#5c6bc0">GA</div>
-              <span class="worklog-person-name">Ganesh Abothula</span>
-            </div>
-            <div class="worklog-entries">
-              <div class="worklog-entry">
-                <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4111" target="_blank" rel="noopener">WPD-4111</a></div>
-                <div class="worklog-summary">[CS Datasource] Develop utility to auto-update feed JSON</div>
-                <div class="worklog-time">1d</div>
-              </div>
-            </div>
-          </div>
-        </div>
-    </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4264" target="_blank">WPD-4264</a></div>
+  <div class="ticket-summary">Getting to know Claude</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Patrick Galego" style="background:#26a69a">PG</div>
+    <span class="priority-badge" style="background:#ffcdd2;color:#c62828">🔴 Highest</span>
   </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4274" target="_blank">WPD-4274</a></div>
+  <div class="ticket-summary">Products Prototype</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Patrick Galego" style="background:#26a69a">PG</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4273" target="_blank">WPD-4273</a></div>
+  <div class="ticket-summary">Products Prototype</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Gustavo Polo" style="background:#ab47bc">GP</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div></div>
+</div>
+<div class="col col-dr" style="border-top:3px solid #4dd0e1">
+  <div class="col-header" style="background:#00838f">
+    <span class="col-emoji">🖌️</span>
+    <span class="col-title">Design Review</span>
+    <span class="col-count">1</span>
+  </div>
+  <div class="col-body"><div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4204" target="_blank">WPD-4204</a></div>
+  <div class="ticket-summary">[UX] Activate Parent Page Template</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Gustavo Polo" style="background:#ab47bc">GP</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div></div>
+</div>
+<div class="col col-ddr" style="border-top:3px solid #80deea">
+  <div class="col-header" style="background:#006064">
+    <span class="col-emoji">👀</span>
+    <span class="col-title">Dev Design Review</span>
+    <span class="col-count">3</span>
+  </div>
+  <div class="col-body"><div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4282" target="_blank">WPD-4282</a></div>
+  <div class="ticket-summary">[FE] (C19 Update) Marquee update from feedback from James</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Gustavo Polo" style="background:#ab47bc">GP</div>
+    <span class="priority-badge" style="background:#ffcdd2;color:#c62828">🔴 Highest</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4198" target="_blank">WPD-4198</a></div>
+  <div class="ticket-summary">[FE][BP2]  Add carousel component</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Gustavo Polo" style="background:#ab47bc">GP</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4195" target="_blank">WPD-4195</a></div>
+  <div class="ticket-summary">[FE][BP2] Add alert component </div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Nick Karch" style="background:#5c6bc0">NK</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div></div>
+</div>
+<div class="col col-ip" style="border-top:3px solid #5b8fa8">
+  <div class="col-header" style="background:#2471a3">
+    <span class="col-emoji">🥾</span>
+    <span class="col-title">In Progress</span>
+    <span class="col-count">24</span>
+  </div>
+  <div class="col-body"><div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4269" target="_blank">WPD-4269</a></div>
+  <div class="ticket-summary">Getting to know Claude</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Nageswara Rao Recharla" style="background:#26a69a">NR</div>
+    <span class="priority-badge" style="background:#ffcdd2;color:#c62828">🔴 Highest</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4268" target="_blank">WPD-4268</a></div>
+  <div class="ticket-summary">Getting to know Claude</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Krishna Kodicherla" style="background:#ef5350">KK</div>
+    <span class="priority-badge" style="background:#ffcdd2;color:#c62828">🔴 Highest</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4267" target="_blank">WPD-4267</a></div>
+  <div class="ticket-summary">Getting to know Claude</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Ganesh Abothula" style="background:#42a5f5">GA</div>
+    <span class="priority-badge" style="background:#ffcdd2;color:#c62828">🔴 Highest</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4266" target="_blank">WPD-4266</a></div>
+  <div class="ticket-summary">Getting to know Claude</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Lenin johnson" style="background:#66bb6a">LJ</div>
+    <span class="priority-badge" style="background:#ffcdd2;color:#c62828">🔴 Highest</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4263" target="_blank">WPD-4263</a></div>
+  <div class="ticket-summary">Getting to know Claude</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Nick Karch" style="background:#5c6bc0">NK</div>
+    <span class="priority-badge" style="background:#ffcdd2;color:#c62828">🔴 Highest</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4262" target="_blank">WPD-4262</a></div>
+  <div class="ticket-summary">Getting to know Claude</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Chris Schultz" style="background:#ff7043">CS</div>
+    <span class="priority-badge" style="background:#ffcdd2;color:#c62828">🔴 Highest</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3655" target="_blank">WPD-3655</a></div>
+  <div class="ticket-summary">[FE] Global Font Change to accommodate for longer translations </div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Nick Karch" style="background:#5c6bc0">NK</div>
+    <span class="priority-badge" style="background:#ffcdd2;color:#c62828">🔴 Highest</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4206" target="_blank">WPD-4206</a></div>
+  <div class="ticket-summary">[FE][BP2] Research for Prefixing tailwind classes</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Nick Karch" style="background:#5c6bc0">NK</div>
+    <span class="priority-badge" style="background:#ffe0b2;color:#e65100">🟠 High</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4292" target="_blank">WPD-4292</a></div>
+  <div class="ticket-summary">WebCMS 1.113.0 release</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Krishna Kodicherla" style="background:#ef5350">KK</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4279" target="_blank">WPD-4279</a></div>
+  <div class="ticket-summary">[Blog Rebuild] Kadence Template Implementation - Search Results Template</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Lenin johnson" style="background:#66bb6a">LJ</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4278" target="_blank">WPD-4278</a></div>
+  <div class="ticket-summary">[Blog Rebuild] Kadence Template Implementation - Archive Template</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Lenin johnson" style="background:#66bb6a">LJ</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4233" target="_blank">WPD-4233</a></div>
+  <div class="ticket-summary">[Blog Rebuild] Kadence Template Implementation - Authors Directory</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Lenin johnson" style="background:#66bb6a">LJ</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4232" target="_blank">WPD-4232</a></div>
+  <div class="ticket-summary">[Blog Rebuild] Kadence Template Implementation - Individual Author Page</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Lenin johnson" style="background:#66bb6a">LJ</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4231" target="_blank">WPD-4231</a></div>
+  <div class="ticket-summary">[Blog Rebuild] Kadence Template Implementation - Single Blog Post</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Lenin johnson" style="background:#66bb6a">LJ</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4230" target="_blank">WPD-4230</a></div>
+  <div class="ticket-summary">[Blog Rebuild] Kadence Template Implementation - Category Pages</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Lenin johnson" style="background:#66bb6a">LJ</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4191" target="_blank">WPD-4191</a></div>
+  <div class="ticket-summary">[QA Env] WPD4072_bug1 Thumbnail image is not removed from demo card</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Krishna Kodicherla" style="background:#ef5350">KK</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4152" target="_blank">WPD-4152</a></div>
+  <div class="ticket-summary">[Wordpress] blogs.opentext.com Plugin Audit &amp; gap analysis</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Lenin johnson" style="background:#66bb6a">LJ</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4148" target="_blank">WPD-4148</a></div>
+  <div class="ticket-summary">[Apps] - Kadence Pro/Ultimate installation/configuration</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Lenin johnson" style="background:#66bb6a">LJ</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4113" target="_blank">WPD-4113</a></div>
+  <div class="ticket-summary">[CS Datasource] Add Product-to-Cloud mapping</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Krishna Kodicherla" style="background:#ef5350">KK</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4112" target="_blank">WPD-4112</a></div>
+  <div class="ticket-summary">[CS Datasource] Align filter and listing components to BluePrint C44.1</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Krishna Kodicherla" style="background:#ef5350">KK</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4111" target="_blank">WPD-4111</a></div>
+  <div class="ticket-summary">[CS Datasource] Develop utility to auto-update feed JSON</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Ganesh Abothula" style="background:#42a5f5">GA</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3899" target="_blank">WPD-3899</a></div>
+  <div class="ticket-summary">[FE][BP2] Apply new color and typography tokens to tooltip component </div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Chris Schultz" style="background:#ff7043">CS</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3770" target="_blank">WPD-3770</a></div>
+  <div class="ticket-summary">Short URL tool — write proposal for ownership migration</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Nageswara Rao Recharla" style="background:#26a69a">NR</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3747" target="_blank">WPD-3747</a></div>
+  <div class="ticket-summary">[FE] Update Language alert and gtm alert to work with BP2</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Nick Karch" style="background:#5c6bc0">NK</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div></div>
+</div>
+<div class="col col-cr" style="border-top:3px solid #ffb74d">
+  <div class="col-header" style="background:#e65100">
+    <span class="col-emoji">🔍</span>
+    <span class="col-title">Code Review</span>
+    <span class="col-count">0</span>
+  </div>
+  <div class="col-body"><div class="empty-col">🌨️ Clear</div></div>
+</div>
+<div class="col col-bl" style="border-top:3px solid #e57373">
+  <div class="col-header" style="background:#c0392b">
+    <span class="col-emoji">🪨</span>
+    <span class="col-title">Blocked</span>
+    <span class="col-count">8</span>
+  </div>
+  <div class="col-body"><div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4158" target="_blank">WPD-4158</a></div>
+  <div class="ticket-summary">[prod-red] WebCMS Upgrade 25.4 | Customers page $LOCAL_NODE_REF console error on Reset, Unchecking filters</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Krishna Kodicherla" style="background:#ef5350">KK</div>
+    <span class="priority-badge" style="background:#ffe0b2;color:#e65100">🟠 High</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4078" target="_blank">WPD-4078</a></div>
+  <div class="ticket-summary">[WEB CMS] New C44.5 Variant </div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Ganesh Abothula" style="background:#42a5f5">GA</div>
+    <span class="priority-badge" style="background:#ffe0b2;color:#e65100">🟠 High</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3902" target="_blank">WPD-3902</a></div>
+  <div class="ticket-summary">[FE] Dynamic Footer + Header</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Nick Karch" style="background:#5c6bc0">NK</div>
+    <span class="priority-badge" style="background:#ffe0b2;color:#e65100">🟠 High</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4257" target="_blank">WPD-4257</a></div>
+  <div class="ticket-summary">[WEB CMS] Create new skin for SaaS navigation </div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Krishna Kodicherla" style="background:#ef5350">KK</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4194" target="_blank">WPD-4194</a></div>
+  <div class="ticket-summary">[FE][BP2] Add avatar component </div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Chris Schultz" style="background:#ff7043">CS</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3895" target="_blank">WPD-3895</a></div>
+  <div class="ticket-summary">[FE][BP2] Apply new color and typography tokens to dropdown component </div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Gustavo Polo" style="background:#ab47bc">GP</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3893" target="_blank">WPD-3893</a></div>
+  <div class="ticket-summary">[FE][BP2] Apply new color and typography tokens to card component </div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Gustavo Polo" style="background:#ab47bc">GP</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3564" target="_blank">WPD-3564</a></div>
+  <div class="ticket-summary">[FE][BP2] Table Component</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Chris Schultz" style="background:#ff7043">CS</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div></div>
+</div>
+<div class="col col-rfqa" style="border-top:3px solid #aed581">
+  <div class="col-header" style="background:#558b2f">
+    <span class="col-emoji">📋</span>
+    <span class="col-title">Ready for QA</span>
+    <span class="col-count">0</span>
+  </div>
+  <div class="col-body"><div class="empty-col">🌨️ Clear</div></div>
+</div>
+<div class="col col-qa" style="border-top:3px solid #e8a838">
+  <div class="col-header" style="background:#d68910">
+    <span class="col-emoji">🔭</span>
+    <span class="col-title">QA In Progress</span>
+    <span class="col-count">2</span>
+  </div>
+  <div class="col-body"><div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4271" target="_blank">WPD-4271</a></div>
+  <div class="ticket-summary">Getting to know Claude</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Swetha Kalluri" style="background:#26c6da">SK</div>
+    <span class="priority-badge" style="background:#ffcdd2;color:#c62828">🔴 Highest</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4270" target="_blank">WPD-4270</a></div>
+  <div class="ticket-summary">Getting to know Claude</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Srinivas Jayaram Rao" style="background:#8d6e63">SR</div>
+    <span class="priority-badge" style="background:#ffcdd2;color:#c62828">🔴 Highest</span>
+  </div>
+</div></div>
+</div>
+<div class="col col-qaf" style="border-top:3px solid #ef9a9a">
+  <div class="col-header" style="background:#b71c1c">
+    <span class="col-emoji">❌</span>
+    <span class="col-title">QA Failed</span>
+    <span class="col-count">0</span>
+  </div>
+  <div class="col-body"><div class="empty-col">🌨️ Clear</div></div>
+</div>
+<div class="col col-rp" style="border-top:3px solid #81c784">
+  <div class="col-header" style="background:#1e8449">
+    <span class="col-emoji">🏔️</span>
+    <span class="col-title">Ready for PROD</span>
+    <span class="col-count">15</span>
+  </div>
+  <div class="col-body"><div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4092" target="_blank">WPD-4092</a></div>
+  <div class="ticket-summary">[FE] Header to be added across all SaaS pages</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Nick Karch" style="background:#5c6bc0">NK</div>
+    <span class="priority-badge" style="background:#ffcdd2;color:#c62828">🔴 Highest</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4277" target="_blank">WPD-4277</a></div>
+  <div class="ticket-summary">DMTH - C38 FAQschema should include both card and secondlevelcard description</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Ganesh Abothula" style="background:#42a5f5">GA</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4251" target="_blank">WPD-4251</a></div>
+  <div class="ticket-summary">FAQ Schema markup for SP07.1</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Krishna Kodicherla" style="background:#ef5350">KK</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4250" target="_blank">WPD-4250</a></div>
+  <div class="ticket-summary">FAQ Schema markup for C38.3</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Krishna Kodicherla" style="background:#ef5350">KK</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4247" target="_blank">WPD-4247</a></div>
+  <div class="ticket-summary">DMTH - FAQ Schema Issues</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Krishna Kodicherla" style="background:#ef5350">KK</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4224" target="_blank">WPD-4224</a></div>
+  <div class="ticket-summary">[QA Env] WPD4040_bug2 Logo Marquee accepts blank values and displays a blank logo</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Ganesh Abothula" style="background:#42a5f5">GA</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4223" target="_blank">WPD-4223</a></div>
+  <div class="ticket-summary">[QA Env] WPD4040_bug1 Max Char limits not applied to Eyebrow and Heading texts</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Ganesh Abothula" style="background:#42a5f5">GA</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4221" target="_blank">WPD-4221</a></div>
+  <div class="ticket-summary">[Web CMS] Make sure BPV2 templates are available</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Ganesh Abothula" style="background:#42a5f5">GA</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4178" target="_blank">WPD-4178</a></div>
+  <div class="ticket-summary">[WEB CMS] Filtering Customer stories by clicking on marquee logo</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Ganesh Abothula" style="background:#42a5f5">GA</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4169" target="_blank">WPD-4169</a></div>
+  <div class="ticket-summary">DMTH - [prod-red] WebCMS Upgrade 25.4 | TinyMCE rendering too small in C04 and C16</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Krishna Kodicherla" style="background:#ef5350">KK</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4118" target="_blank">WPD-4118</a></div>
+  <div class="ticket-summary">[BE][Prod] Opentext.com - Closing Language Switcher the page scrolls up</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Ganesh Abothula" style="background:#42a5f5">GA</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4072" target="_blank">WPD-4072</a></div>
+  <div class="ticket-summary">[WEB CMS] Implementation - Simplify Demo Card Layout &amp; Support YouTube Modals - Demo Resources API</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Krishna Kodicherla" style="background:#ef5350">KK</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4040" target="_blank">WPD-4040</a></div>
+  <div class="ticket-summary">[WEB CMS] C02.12 Hero Banner [Logo Marquee]</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Ganesh Abothula" style="background:#42a5f5">GA</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3880" target="_blank">WPD-3880</a></div>
+  <div class="ticket-summary">[BE] Implment classes &amp; id's to elements to be tracked by GA4</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Krishna Kodicherla" style="background:#ef5350">KK</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div>
+<div class="ticket-card">
+  <div class="ticket-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3240" target="_blank">WPD-3240</a></div>
+  <div class="ticket-summary">Update DCR Components to Support FAQ Schema Tagging</div>
+  <div class="ticket-footer">
+    <div class="avatar" title="Krishna Kodicherla" style="background:#ef5350">KK</div>
+    <span class="priority-badge" style="background:#bbdefb;color:#1565c0">🔵 Medium</span>
+  </div>
+</div></div>
+</div>
+  </div>
+</div>
 
-  <!-- FOOTER -->
-  <footer>
-    &#x26F0;&#xFE0F; Sprint Status Dashboard &middot; Current Sprint &middot; WPD &middot; Time logged: last business day &middot; Generated 2026-06-03 17:16 MDT
-  </footer>
+<section class="worklog-section">
+  <h2 class="worklog-header">🌲 Time Logged — Today: Thursday, Jun 04 2026</h2>
+  <div class="wl-grid"><div class="wl-card">
+  <div class="wl-person">
+    <div class="avatar" title="Ganesh Abothula" style="background:#42a5f5">GA</div>
+    <span class="wl-name">Ganesh Abothula</span>
+  </div>
+  <div class="wl-entries"><div class="wl-entry"><a href="https://opentexthq.atlassian.net/browse/WPD-4111" target="_blank">WPD-4111</a> <span class="wl-time">1d</span> <span class="wl-summary">[CS Datasource] Develop utility to auto-update feed JSON</span></div>
+</div>
+</div>
+<div class="wl-card">
+  <div class="wl-person">
+    <div class="avatar" title="Krishna Kodicherla" style="background:#ef5350">KK</div>
+    <span class="wl-name">Krishna Kodicherla</span>
+  </div>
+  <div class="wl-entries"><div class="wl-entry"><a href="https://opentexthq.atlassian.net/browse/WPD-4292" target="_blank">WPD-4292</a> <span class="wl-time">2h</span> <span class="wl-summary">WebCMS 1.113.0 release</span></div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="worklog-section">
+  <h2 class="worklog-header">🌲 Time Logged — Last Business Day: Wednesday, Jun 03 2026</h2>
+  <div class="wl-grid"><div class="wl-card">
+  <div class="wl-person">
+    <div class="avatar" title="Chris Schultz" style="background:#ff7043">CS</div>
+    <span class="wl-name">Chris Schultz</span>
+  </div>
+  <div class="wl-entries"><div class="wl-entry"><a href="https://opentexthq.atlassian.net/browse/WPD-4262" target="_blank">WPD-4262</a> <span class="wl-time">1d</span> <span class="wl-summary">Getting to know Claude</span></div>
+</div>
+</div>
+<div class="wl-card">
+  <div class="wl-person">
+    <div class="avatar" title="Ganesh Abothula" style="background:#42a5f5">GA</div>
+    <span class="wl-name">Ganesh Abothula</span>
+  </div>
+  <div class="wl-entries"><div class="wl-entry"><a href="https://opentexthq.atlassian.net/browse/WPD-4267" target="_blank">WPD-4267</a> <span class="wl-time">1d</span> <span class="wl-summary">Getting to know Claude</span></div>
+</div>
+</div>
+<div class="wl-card">
+  <div class="wl-person">
+    <div class="avatar" title="Nageswara Rao Recharla" style="background:#26a69a">NR</div>
+    <span class="wl-name">Nageswara Rao Recharla</span>
+  </div>
+  <div class="wl-entries"><div class="wl-entry"><a href="https://opentexthq.atlassian.net/browse/WPD-4291" target="_blank">WPD-4291</a> <span class="wl-time">1d</span> <span class="wl-summary">[APPS][ot.digital] Enablement Web CMS: multi-asset catalog (videos + docs) on enablement.ot.digital</span></div>
+<div class="wl-entry"><a href="https://opentexthq.atlassian.net/browse/WPD-4269" target="_blank">WPD-4269</a> <span class="wl-time">1d</span> <span class="wl-summary">Getting to know Claude</span></div>
+</div>
+</div>
+<div class="wl-card">
+  <div class="wl-person">
+    <div class="avatar" title="Nick Karch" style="background:#5c6bc0">NK</div>
+    <span class="wl-name">Nick Karch</span>
+  </div>
+  <div class="wl-entries"><div class="wl-entry"><a href="https://opentexthq.atlassian.net/browse/WPD-4263" target="_blank">WPD-4263</a> <span class="wl-time">8m</span> <span class="wl-summary">Getting to know Claude</span></div>
+</div>
+</div>
+<div class="wl-card">
+  <div class="wl-person">
+    <div class="avatar" title="Patrick Galego" style="background:#26a69a">PG</div>
+    <span class="wl-name">Patrick Galego</span>
+  </div>
+  <div class="wl-entries"><div class="wl-entry"><a href="https://opentexthq.atlassian.net/browse/WPD-4264" target="_blank">WPD-4264</a> <span class="wl-time">1d</span> <span class="wl-summary">Getting to know Claude</span></div>
+</div>
+</div>
+</div>
+</section>
+
+<footer>⛰️ Sprint Status Dashboard &middot; Current Sprint &middot; WPD &middot; Generated 2026-06-04 08:05 MDT</footer>
 
 <script src="teams.js"></script>
 </body>
