@@ -22,49 +22,47 @@ def priority_color(p):
     return {'Highest':'#c62828','High':'#e64a19','Medium':'#455a64','Low':'#2e7d32'}.get(p,'#455a64')
 
 in_progress = [
-    {"key":"WPD-4267","summary":"Getting to know Claude","assignee":"Ganesh Abothula","priority":"Highest"},
-    {"key":"WPD-4291","summary":"[APPS][ot.digital] Enablement Web CMS: multi-asset catalog (videos + docs) on enablement.ot.digital","assignee":"Nageswara Rao Recharla","priority":"Medium"},
-    {"key":"WPD-4266","summary":"Getting to know Claude","assignee":"Lenin johnson","priority":"Highest"},
-    {"key":"WPD-4148","summary":"[Apps] - Kadence Pro/Ultimate installation/configuration","assignee":"Lenin johnson","priority":"Medium"},
-    {"key":"WPD-3564","summary":"[FE][BP2] Table Component","assignee":"Chris Schultz","priority":"Medium"},
-    {"key":"WPD-4262","summary":"Getting to know Claude","assignee":"Chris Schultz","priority":"Highest"},
-    {"key":"WPD-3747","summary":"[FE] Update Language alert and gtm alert to work with BP2","assignee":"Nick Karch","priority":"Medium"},
-    {"key":"WPD-3770","summary":"Short URL tool — write proposal for ownership migration","assignee":"Nageswara Rao Recharla","priority":"Medium"},
-    {"key":"WPD-4112","summary":"[CS Datasource] Align filter and listing components to BluePrint C44.1","assignee":"Krishna Kodicherla","priority":"Medium"},
+    {"key":"WPD-4403","summary":"[FE] Dry Run of Launch","assignee":"Chris Schultz","priority":"Highest"},
+    {"key":"WPD-4381","summary":"[FE] Social Share capability","assignee":"Chris Schultz","priority":"Medium"},
+    {"key":"WPD-4357","summary":"Claude Sprint 78","assignee":"Ganesh Abothula","priority":"Medium"},
+    {"key":"WPD-4356","summary":"Claude Sprint 78","assignee":"Lenin johnson","priority":"Medium"},
+    {"key":"WPD-4353","summary":"Claude Sprint 78","assignee":"Nick Karch","priority":"Medium"},
+    {"key":"WPD-4349","summary":"[FE] Update Enablement Design","assignee":"Chris Schultz","priority":"Highest"},
+    {"key":"WPD-4237","summary":"[Content] (C19 Update) Marquee on Homepage Blip Resolution","assignee":"Jenny Luke","priority":"Medium"},
+    {"key":"WPD-4219","summary":"[ot.digital] Migrate analytics to BIG Query from SQL","assignee":"Nageswara Rao Recharla","priority":"Medium"},
+    {"key":"WPD-3963","summary":"[Dev QA] solutions.ot.com | fr | In &quot;Contact Us&quot; form the mobile number field not optimized for 10-digit number","assignee":"Nick Karch","priority":"Medium"},
     {"key":"WPD-3899","summary":"[FE][BP2] Apply new color and typography tokens to tooltip component","assignee":"Chris Schultz","priority":"Medium"},
-    {"key":"WPD-4263","summary":"Getting to know Claude","assignee":"Nick Karch","priority":"Highest"},
-    {"key":"WPD-4111","summary":"[CS Datasource] Develop utility to auto-update feed JSON","assignee":"Ganesh Abothula","priority":"Medium"},
-    {"key":"WPD-4269","summary":"Getting to know Claude","assignee":"Nageswara Rao Recharla","priority":"Highest"},
     {"key":"WPD-3655","summary":"[FE] Global Font Change to accommodate for longer translations","assignee":"Nick Karch","priority":"Highest"},
-    {"key":"WPD-4113","summary":"[CS Datasource] Add Product-to-Cloud mapping","assignee":"Krishna Kodicherla","priority":"Medium"},
-    {"key":"WPD-4152","summary":"[Wordpress] blogs.opentext.com Plugin Audit &amp; gap analysis","assignee":"Lenin johnson","priority":"Medium"},
-    {"key":"WPD-4268","summary":"Getting to know Claude","assignee":"Krishna Kodicherla","priority":"Highest"},
-    {"key":"WPD-4191","summary":"[QA Env] WPD4072_bug1 Thumbnail image is not removed from demo card","assignee":"Krishna Kodicherla","priority":"Medium"},
-    {"key":"WPD-4206","summary":"[FE][BP2] Research for Prefixing tailwind classes","assignee":"Nick Karch","priority":"High"},
+    {"key":"WPD-3593","summary":"(Apps) Search results updates","assignee":"Lenin johnson","priority":"Medium"},
 ]
 
 blocked = [
-    {"key":"WPD-4231","summary":"[Blog Rebuild] Kadence Template Implementation - Single Blog Post","assignee":"Lenin johnson","priority":"Medium"},
-    {"key":"WPD-4279","summary":"[Blog Rebuild] Kadence Template Implementation - Search Results Template","assignee":"Lenin johnson","priority":"Medium"},
-    {"key":"WPD-4194","summary":"[FE][BP2] Add avatar component","assignee":"Chris Schultz","priority":"Medium"},
-    {"key":"WPD-4158","summary":"[prod-red] WebCMS Upgrade 25.4 | Customers page $LOCAL_NODE_REF console error on Reset, Unchecking filters","assignee":"Krishna Kodicherla","priority":"High"},
-    {"key":"WPD-3895","summary":"[FE][BP2] Apply new color and typography tokens to dropdown component","assignee":"Gustavo Polo","priority":"Medium"},
-    {"key":"WPD-3893","summary":"[FE][BP2] Apply new color and typography tokens to card component","assignee":"Gustavo Polo","priority":"Medium"},
-    {"key":"WPD-4233","summary":"[Blog Rebuild] Kadence Template Implementation - Authors Directory","assignee":"Lenin johnson","priority":"Medium"},
-    {"key":"WPD-4230","summary":"[Blog Rebuild] Kadence Template Implementation - Category Pages","assignee":"Lenin johnson","priority":"Medium"},
-    {"key":"WPD-4278","summary":"[Blog Rebuild] Kadence Template Implementation - Archive Template","assignee":"Lenin johnson","priority":"Medium"},
-    {"key":"WPD-4232","summary":"[Blog Rebuild] Kadence Template Implementation - Individual Author Page","assignee":"Lenin johnson","priority":"Medium"},
-    {"key":"WPD-4257","summary":"[WEB CMS] Create new skin for SaaS navigation","assignee":"Krishna Kodicherla","priority":"Medium"},
-    {"key":"WPD-4078","summary":"[WEB CMS] New C44.5 Variant","assignee":"Ganesh Abothula","priority":"High"},
-    {"key":"WPD-3902","summary":"[FE] Dynamic Footer + Header","assignee":"Nick Karch","priority":"High"},
+    {"key":"WPD-4345","summary":"WPD4323_bug1 For Press Releases unable to select Schedule Publishing workflow","assignee":"Krishna Kodicherla","priority":"Medium","block_reason":""},
+    {"key":"WPD-4331","summary":"[QA Env] (BE)WPD-4257_bug2_Component shift issue when header menus are clicked","assignee":"Krishna Kodicherla","priority":"Medium","block_reason":""},
+    {"key":"WPD-4323","summary":"[DMTH] - changes to publish workflow","assignee":"Srinivas Jayaram Rao","priority":"Medium","block_reason":""},
+    {"key":"WPD-4287","summary":"[BE] Evaluate Fix for longer translations","assignee":"Krishna Kodicherla","priority":"Highest","block_reason":""},
+    {"key":"WPD-4259","summary":"[FE] Update Menu Builder to create BPv2 Header","assignee":"Nick Karch","priority":"Medium","block_reason":""},
+    {"key":"WPD-4206","summary":"[FE][BP2] Research for Prefixing tailwind classes","assignee":"Nick Karch","priority":"High","block_reason":""},
+    {"key":"WPD-4194","summary":"[FE][BP2] Add avatar component","assignee":"Chris Schultz","priority":"Medium","block_reason":""},
+    {"key":"WPD-4078","summary":"[WEB CMS] New C44.5 Variant","assignee":"Ganesh Abothula","priority":"High","block_reason":""},
+    {"key":"WPD-3902","summary":"[FE] Dynamic Footer + Header","assignee":"Nick Karch","priority":"High","block_reason":""},
+    {"key":"WPD-3564","summary":"[FE][BP2] Table Component","assignee":"Chris Schultz","priority":"Medium","block_reason":""},
 ]
 
 qa_in_progress = [
-    {"key":"WPD-4270","summary":"Getting to know Claude","assignee":"Srinivas Jayaram Rao","priority":"Highest"},
-    {"key":"WPD-4271","summary":"Getting to know Claude","assignee":"Swetha Kalluri","priority":"Highest"},
 ]
 
-ready_for_production = []
+ready_for_production = [
+    {"key":"WPD-4336","summary":"[DMTH] - subnav relative path link does not work any more","assignee":"Ganesh Abothula","priority":"Medium"},
+    {"key":"WPD-4296","summary":"[DMTH] - Add the year 2026 to In the News dropdown filters","assignee":"Ganesh Abothula","priority":"Medium"},
+    {"key":"WPD-4293","summary":"[DMTH] - C05 and C09 components have horizontal auto-scrolling when they shouldn't be","assignee":"Nick Karch","priority":"Highest"},
+    {"key":"WPD-4282","summary":"[FE] (C19 Update) Marquee update from feedback from James","assignee":"Chris Schultz","priority":"Highest"},
+    {"key":"WPD-4174","summary":"DMTH - Chatbot interference with web component side scroll functions","assignee":"Lenin johnson","priority":"Medium"},
+    {"key":"WPD-4169","summary":"DMTH - [prod-red] WebCMS Upgrade 25.4 | TinyMCE rendering too small in C04 and C16","assignee":"Krishna Kodicherla","priority":"Medium"},
+    {"key":"WPD-4072","summary":"[WEB CMS] Implementation - Simplify Demo Card Layout &amp; Support YouTube Modals - Demo Resources API","assignee":"Krishna Kodicherla","priority":"Medium"},
+    {"key":"WPD-3880","summary":"[BE] Implement classes &amp; id's to elements to be tracked by GA4","assignee":"Krishna Kodicherla","priority":"Medium"},
+    {"key":"WPD-3747","summary":"[FE] Update Language alert and gtm alert to work with BP2","assignee":"Nick Karch","priority":"Medium"},
+]
 
 worklogs_by_author = {
     "Lenin johnson": [
@@ -341,7 +339,7 @@ html_out = f"""<!DOCTYPE html>
   <header class="hero">
     <div class="hero-content">
       <h1>&#x26F0;&#xFE0F; Trail Status Dashboard</h1>
-      <div class="subtitle">Web Programs Development &middot; June 03, 2026 &middot; opentexthq.atlassian.net</div>
+      <div class="subtitle">Web Programs Development &middot; June 23, 2026 &middot; opentexthq.atlassian.net</div>
       <span class="badge">&#x1F3D5;&#xFE0F; Current Sprint Only &middot; WPD</span>
     </div>
     <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
@@ -354,19 +352,19 @@ html_out = f"""<!DOCTYPE html>
   <!-- STATS BAR -->
   <div class="stats-bar">
     <div class="stat-box">
-      <div class="count c-ip">19</div>
+      <div class="count c-ip">{len(in_progress)}</div>
       <div class="label">&#x1F97E; In Progress</div>
     </div>
     <div class="stat-box">
-      <div class="count c-bl">13</div>
+      <div class="count c-bl">{len(blocked)}</div>
       <div class="label">&#x1FAA8; Blocked</div>
     </div>
     <div class="stat-box">
-      <div class="count c-qa">2</div>
+      <div class="count c-qa">{len(qa_in_progress)}</div>
       <div class="label">&#x1F52D; QA In Progress</div>
     </div>
     <div class="stat-box">
-      <div class="count c-rp">0</div>
+      <div class="count c-rp">{len(ready_for_production)}</div>
       <div class="label">&#x1F3D4;&#xFE0F; Ready for Prod</div>
     </div>
   </div>
