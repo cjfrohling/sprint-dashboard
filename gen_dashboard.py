@@ -22,29 +22,31 @@ def priority_color(p):
     return {'Highest':'#c62828','High':'#e64a19','Medium':'#455a64','Low':'#2e7d32'}.get(p,'#455a64')
 
 in_progress = [
+    {"key":"WPD-4442","summary":"[QA Env] WPD4112_bug4 UI overlap in By Products dropdown menu","assignee":"Krishna Kodicherla","priority":"Medium"},
+    {"key":"WPD-4441","summary":"[QA Env] WPD4112_bug3 Tags with '&' symbol not supported in By Industry, By Product dropdown","assignee":"Krishna Kodicherla","priority":"Medium"},
     {"key":"WPD-4403","summary":"[FE] Dry Run of Launch","assignee":"Chris Schultz","priority":"Highest"},
-    {"key":"WPD-4381","summary":"[FE] Social Share capability","assignee":"Chris Schultz","priority":"Medium"},
+    {"key":"WPD-4381","summary":"[FE] Social Share capability ","assignee":"Chris Schultz","priority":"Medium"},
     {"key":"WPD-4357","summary":"Claude Sprint 78","assignee":"Ganesh Abothula","priority":"Medium"},
     {"key":"WPD-4356","summary":"Claude Sprint 78","assignee":"Lenin johnson","priority":"Medium"},
-    {"key":"WPD-4353","summary":"Claude Sprint 78","assignee":"Nick Karch","priority":"Medium"},
-    {"key":"WPD-4349","summary":"[FE] Update Enablement Design","assignee":"Chris Schultz","priority":"Highest"},
+    {"key":"WPD-4353","summary":"[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)","assignee":"Nick Karch","priority":"Highest"},
+    {"key":"WPD-4352","summary":"[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)","assignee":"Chris Schultz","priority":"Highest"},
+    {"key":"WPD-4346","summary":"[Prod] JP - Press Release filtering does not work for By Product category","assignee":"Ganesh Abothula","priority":"Medium"},
     {"key":"WPD-4237","summary":"[Content] (C19 Update) Marquee on Homepage Blip Resolution","assignee":"Jenny Luke","priority":"Medium"},
     {"key":"WPD-4219","summary":"[ot.digital] Migrate analytics to BIG Query from SQL","assignee":"Nageswara Rao Recharla","priority":"Medium"},
-    {"key":"WPD-3963","summary":"[Dev QA] solutions.ot.com | fr | In &quot;Contact Us&quot; form the mobile number field not optimized for 10-digit number","assignee":"Nick Karch","priority":"Medium"},
-    {"key":"WPD-3899","summary":"[FE][BP2] Apply new color and typography tokens to tooltip component","assignee":"Chris Schultz","priority":"Medium"},
-    {"key":"WPD-3655","summary":"[FE] Global Font Change to accommodate for longer translations","assignee":"Nick Karch","priority":"Highest"},
+    {"key":"WPD-3963","summary":"[Dev QA] | solutions.ot.com | fr | homepage, information mgmt, predictive maintenance page | iPhone | In \"Contact Us\" form the mobile number field not optimized for 10-digit number","assignee":"Nick Karch","priority":"Medium"},
+    {"key":"WPD-3899","summary":"[FE][BP2] Apply new color and typography tokens to tooltip component ","assignee":"Chris Schultz","priority":"Medium"},
+    {"key":"WPD-3655","summary":"[FE] Global Font Change to accommodate for longer translations ","assignee":"Nick Karch","priority":"Highest"},
     {"key":"WPD-3593","summary":"(Apps) Search results updates","assignee":"Lenin johnson","priority":"Medium"},
 ]
 
 blocked = [
     {"key":"WPD-4345","summary":"WPD4323_bug1 For Press Releases unable to select Schedule Publishing workflow","assignee":"Krishna Kodicherla","priority":"Medium","block_reason":""},
-    {"key":"WPD-4331","summary":"[QA Env] (BE)WPD-4257_bug2_Component shift issue when header menus are clicked","assignee":"Krishna Kodicherla","priority":"Medium","block_reason":""},
     {"key":"WPD-4323","summary":"[DMTH] - changes to publish workflow","assignee":"Srinivas Jayaram Rao","priority":"Medium","block_reason":""},
     {"key":"WPD-4287","summary":"[BE] Evaluate Fix for longer translations","assignee":"Krishna Kodicherla","priority":"Highest","block_reason":""},
     {"key":"WPD-4259","summary":"[FE] Update Menu Builder to create BPv2 Header","assignee":"Nick Karch","priority":"Medium","block_reason":""},
     {"key":"WPD-4206","summary":"[FE][BP2] Research for Prefixing tailwind classes","assignee":"Nick Karch","priority":"High","block_reason":""},
-    {"key":"WPD-4194","summary":"[FE][BP2] Add avatar component","assignee":"Chris Schultz","priority":"Medium","block_reason":""},
-    {"key":"WPD-4078","summary":"[WEB CMS] New C44.5 Variant","assignee":"Ganesh Abothula","priority":"High","block_reason":""},
+    {"key":"WPD-4194","summary":"[FE][BP2] Add avatar component ","assignee":"Chris Schultz","priority":"Medium","block_reason":""},
+    {"key":"WPD-4078","summary":"[WEB CMS] New C44.5 Variant ","assignee":"Ganesh Abothula","priority":"High","block_reason":""},
     {"key":"WPD-3902","summary":"[FE] Dynamic Footer + Header","assignee":"Nick Karch","priority":"High","block_reason":""},
     {"key":"WPD-3564","summary":"[FE][BP2] Table Component","assignee":"Chris Schultz","priority":"Medium","block_reason":""},
 ]
@@ -56,12 +58,6 @@ ready_for_production = [
     {"key":"WPD-4336","summary":"[DMTH] - subnav relative path link does not work any more","assignee":"Ganesh Abothula","priority":"Medium"},
     {"key":"WPD-4296","summary":"[DMTH] - Add the year 2026 to In the News dropdown filters","assignee":"Ganesh Abothula","priority":"Medium"},
     {"key":"WPD-4293","summary":"[DMTH] - C05 and C09 components have horizontal auto-scrolling when they shouldn't be","assignee":"Nick Karch","priority":"Highest"},
-    {"key":"WPD-4282","summary":"[FE] (C19 Update) Marquee update from feedback from James","assignee":"Chris Schultz","priority":"Highest"},
-    {"key":"WPD-4174","summary":"DMTH - Chatbot interference with web component side scroll functions","assignee":"Lenin johnson","priority":"Medium"},
-    {"key":"WPD-4169","summary":"DMTH - [prod-red] WebCMS Upgrade 25.4 | TinyMCE rendering too small in C04 and C16","assignee":"Krishna Kodicherla","priority":"Medium"},
-    {"key":"WPD-4072","summary":"[WEB CMS] Implementation - Simplify Demo Card Layout &amp; Support YouTube Modals - Demo Resources API","assignee":"Krishna Kodicherla","priority":"Medium"},
-    {"key":"WPD-3880","summary":"[BE] Implement classes &amp; id's to elements to be tracked by GA4","assignee":"Krishna Kodicherla","priority":"Medium"},
-    {"key":"WPD-3747","summary":"[FE] Update Language alert and gtm alert to work with BP2","assignee":"Nick Karch","priority":"Medium"},
 ]
 
 worklogs_by_author = {
@@ -339,7 +335,7 @@ html_out = f"""<!DOCTYPE html>
   <header class="hero">
     <div class="hero-content">
       <h1>&#x26F0;&#xFE0F; Trail Status Dashboard</h1>
-      <div class="subtitle">Web Programs Development &middot; June 23, 2026 &middot; opentexthq.atlassian.net</div>
+      <div class="subtitle">Web Programs Development &middot; June 24, 2026 &middot; opentexthq.atlassian.net</div>
       <span class="badge">&#x1F3D5;&#xFE0F; Current Sprint Only &middot; WPD</span>
     </div>
     <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
