@@ -22,19 +22,23 @@ def priority_color(p):
     return {'Highest':'#c62828','High':'#e64a19','Medium':'#455a64','Low':'#2e7d32'}.get(p,'#455a64')
 
 in_progress = [
-    {"key":"WPD-4442","summary":"[QA Env] WPD4112_bug4 UI overlap in By Products dropdown menu","assignee":"Krishna Kodicherla","priority":"Medium"},
-    {"key":"WPD-4441","summary":"[QA Env] WPD4112_bug3 Tags with '&' symbol not supported in By Industry, By Product dropdown","assignee":"Krishna Kodicherla","priority":"Medium"},
+    {"key":"WPD-4441","summary":"[QA Env] WPD4112_bug3 Tags with '&' symbol not supported in By Industry, By Product dropdown","assignee":"Ganesh Abothula","priority":"Medium"},
+    {"key":"WPD-4413","summary":"[CRITICAL][QA Env] Blogs QA | Search Results - 'Nothing Found' is hard to read","assignee":"Chris Schultz","priority":"High"},
     {"key":"WPD-4403","summary":"[FE] Dry Run of Launch","assignee":"Chris Schultz","priority":"Highest"},
     {"key":"WPD-4381","summary":"[FE] Social Share capability ","assignee":"Chris Schultz","priority":"Medium"},
+    {"key":"WPD-4365","summary":"[CRITICAL][QA Env] Blogs QA | Single Blog Post - 4 Contrast Errors","assignee":"Chris Schultz","priority":"High"},
+    {"key":"WPD-4364","summary":"[CRITICAL] [QA Env] Blogs QA | Homepage - Issues in Performance, Accessibility, w3c validator scans","assignee":"Chris Schultz","priority":"High"},
+    {"key":"WPD-4359","summary":"Claude Sprint 78","assignee":"Nageswara Rao Recharla","priority":"Medium"},
+    {"key":"WPD-4358","summary":"Claude Sprint 78","assignee":"Krishna Kodicherla","priority":"Medium"},
     {"key":"WPD-4357","summary":"Claude Sprint 78","assignee":"Ganesh Abothula","priority":"Medium"},
     {"key":"WPD-4356","summary":"Claude Sprint 78","assignee":"Lenin johnson","priority":"Medium"},
     {"key":"WPD-4353","summary":"[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)","assignee":"Nick Karch","priority":"Highest"},
     {"key":"WPD-4352","summary":"[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)","assignee":"Chris Schultz","priority":"Highest"},
     {"key":"WPD-4346","summary":"[Prod] JP - Press Release filtering does not work for By Product category","assignee":"Ganesh Abothula","priority":"Medium"},
     {"key":"WPD-4237","summary":"[Content] (C19 Update) Marquee on Homepage Blip Resolution","assignee":"Jenny Luke","priority":"Medium"},
-    {"key":"WPD-4219","summary":"[ot.digital] Migrate analytics to BIG Query from SQL","assignee":"Nageswara Rao Recharla","priority":"Medium"},
     {"key":"WPD-3963","summary":"[Dev QA] | solutions.ot.com | fr | homepage, information mgmt, predictive maintenance page | iPhone | In \"Contact Us\" form the mobile number field not optimized for 10-digit number","assignee":"Nick Karch","priority":"Medium"},
     {"key":"WPD-3899","summary":"[FE][BP2] Apply new color and typography tokens to tooltip component ","assignee":"Chris Schultz","priority":"Medium"},
+    {"key":"WPD-3773","summary":"[FE] Update C36m to reflect to updates made to C36","assignee":"Nick Karch","priority":"Medium"},
     {"key":"WPD-3655","summary":"[FE] Global Font Change to accommodate for longer translations ","assignee":"Nick Karch","priority":"Highest"},
     {"key":"WPD-3593","summary":"(Apps) Search results updates","assignee":"Lenin johnson","priority":"Medium"},
 ]
@@ -55,9 +59,7 @@ qa_in_progress = [
 ]
 
 ready_for_production = [
-    {"key":"WPD-4336","summary":"[DMTH] - subnav relative path link does not work any more","assignee":"Ganesh Abothula","priority":"Medium"},
-    {"key":"WPD-4296","summary":"[DMTH] - Add the year 2026 to In the News dropdown filters","assignee":"Ganesh Abothula","priority":"Medium"},
-    {"key":"WPD-4293","summary":"[DMTH] - C05 and C09 components have horizontal auto-scrolling when they shouldn't be","assignee":"Nick Karch","priority":"Highest"},
+    {"key":"WPD-4405","summary":"[QA Env] Creating a News Release with JP title in JP locale gives error","assignee":"Ganesh Abothula","priority":"Medium"},
 ]
 
 worklogs_by_author = {
