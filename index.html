@@ -1,849 +1,573 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⛰️ Sprint Status Dashboard — WPD</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a1628;color:#e2e8f0;min-height:100vh}
-a{color:inherit;text-decoration:none}
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:rgba(255,255,255,0.05)}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.2);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.35)}
-.section-card{background:rgba(255,255,255,0.04);border-radius:12px;padding:20px 24px;margin-bottom:24px;border:1px solid rgba(255,255,255,0.08)}
-.section-title{font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>&#x26F0;&#xFE0F; Trail Status Dashboard &mdash; WPD</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a2f3a;
+      color: #d4e3ec;
+      min-height: 100vh;
+    }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, #0d1b2a 0%, #1a3a5c 40%, #2d5a8e 75%, #3d7a9e 100%);
+      position: relative;
+      overflow: hidden;
+      padding: 44px 32px 0;
+      text-align: center;
+    }
+    .hero-content { position: relative; z-index: 1; padding-bottom: 12px; }
+    .hero h1 { font-size: 2.5rem; font-weight: 700; color: #e8f4f8; letter-spacing: -0.5px; }
+    .hero .subtitle { color: #a8d0e6; margin-top: 8px; font-size: 0.95rem; }
+    .hero .badge {
+      display: inline-block; margin-top: 12px; padding: 4px 16px;
+      background: rgba(168,208,230,0.15); border: 1px solid rgba(168,208,230,0.35);
+      border-radius: 20px; color: #a8d0e6; font-size: 0.8rem;
+    }
+    .hero svg { display: block; width: 100%; margin-top: -8px; }
+
+    /* STATS BAR */
+    .stats-bar {
+      background: #2d4a5e; padding: 14px 32px;
+      display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+    }
+    .stat-box {
+      text-align: center; padding: 12px 28px;
+      background: rgba(0,0,0,0.25); border-radius: 8px; min-width: 130px;
+    }
+    .stat-box .count { font-size: 2.1rem; font-weight: 700; line-height: 1; }
+    .stat-box .label { font-size: 0.77rem; color: #8b9ba8; margin-top: 4px; }
+    .c-ip { color: #5b8fa8; } .c-bl { color: #e57373; }
+    .c-qa { color: #e8a838; } .c-rp { color: #81c784; }
+
+    /* BOARD */
+    .board {
+      padding: 22px 20px; display: grid;
+      grid-template-columns: repeat(4, 1fr); gap: 18px;
+      max-width: 1700px; margin: 0 auto;
+    }
+    @media (max-width: 1150px) { .board { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 640px)  { .board { grid-template-columns: 1fr; } }
+
+    .column { display: flex; flex-direction: column; }
+    .col-header {
+      padding: 10px 14px; border-radius: 8px 8px 0 0;
+      font-weight: 600; font-size: 0.84rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .col-count {
+      background: rgba(255,255,255,0.22); border-radius: 12px;
+      padding: 1px 9px; font-size: 0.73rem;
+    }
+    .col-body {
+      border: 2px solid; border-top: none;
+      border-radius: 0 0 8px 8px; overflow: hidden; flex: 1;
+    }
+    .col-in-progress .col-header { background: #2471a3; }
+    .col-in-progress .col-body   { border-color: #5b8fa8; }
+    .col-blocked .col-header     { background: #c0392b; }
+    .col-blocked .col-body       { border-color: #e57373; }
+    .col-qa .col-header          { background: #d68910; }
+    .col-qa .col-body            { border-color: #e8a838; }
+    .col-ready .col-header       { background: #1e8449; }
+    .col-ready .col-body         { border-color: #81c784; }
+
+    /* CARDS */
+    .card {
+      padding: 9px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: #1e3545; transition: background 0.15s;
+    }
+    .card:last-child { border-bottom: none; }
+    .card:hover { background: #253f52; }
+    .card-key a {
+      color: #a8d0e6; text-decoration: none;
+      font-size: 0.74rem; font-weight: 600;
+    }
+    .card-key a:hover { text-decoration: underline; }
+    .card-summary { color: #c8dde8; font-size: 0.81rem; margin: 3px 0 0; line-height: 1.35; }
+    .card-meta {
+      display: flex; align-items: center; gap: 5px;
+      margin-top: 7px; flex-wrap: wrap;
+    }
+    .avatar {
+      width: 18px; height: 18px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.54rem; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .assignee-name { font-size: 0.71rem; color: #8b9ba8; }
+    .priority-badge {
+      font-size: 0.64rem; font-weight: 600; padding: 1px 6px;
+      border-radius: 3px; color: #fff; margin-left: auto;
+    }
+    .empty-col {
+      padding: 24px 14px; text-align: center;
+      color: #8b9ba8; font-size: 0.82rem; font-style: italic;
+      background: #1e3545;
+    }
+
+    /* WORKLOG */
+    .worklog-section {
+      max-width: 1700px; margin: 6px auto 28px; padding: 0 20px;
+    }
+    .worklog-header {
+      background: #2e5944; padding: 12px 18px;
+      border-radius: 8px 8px 0 0;
+      font-weight: 600; font-size: 0.88rem; color: #a8d8b0;
+    }
+    .worklog-body {
+      background: #1e3545; border: 2px solid #2e5944;
+      border-top: none; border-radius: 0 0 8px 8px; padding: 16px;
+    }
+    .worklog-grid {
+      display: flex; flex-wrap: wrap; gap: 14px;
+    }
+    .worklog-person {
+      flex: 1 1 310px; background: #243e50;
+      border-radius: 8px; overflow: hidden;
+    }
+    .worklog-person-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; background: rgba(0,0,0,0.18);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .worklog-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.68rem; font-weight: 700; color: #fff;
+    }
+    .worklog-person-name { font-weight: 600; font-size: 0.84rem; color: #c8dde8; }
+    .worklog-entries { padding: 4px 0; }
+    .worklog-entry {
+      display: grid; grid-template-columns: 88px 1fr 68px;
+      gap: 8px; padding: 6px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      align-items: start;
+    }
+    .worklog-entry:last-child { border-bottom: none; }
+    .worklog-key a {
+      color: #a8d0e6; text-decoration: none;
+      font-size: 0.73rem; font-weight: 600;
+    }
+    .worklog-key a:hover { text-decoration: underline; }
+    .worklog-summary { font-size: 0.77rem; color: #8b9ba8; line-height: 1.3; }
+    .worklog-time { font-size: 0.74rem; color: #c9a86c; font-weight: 600; text-align: right; }
+    .no-worklog { padding: 20px; text-align: center; color: #8b9ba8; font-style: italic; }
+
+    /* FOOTER */
+    footer {
+      text-align: center; padding: 16px;
+      color: #8b9ba8; font-size: 0.74rem;
+      border-top: 1px solid #2d4a5e; margin-top: 8px;
+    }
+  </style>
 </head>
 <body>
 
-<!-- HERO -->
-<div style="background:linear-gradient(135deg,#0d1b2a 0%,#1a3a5c 33%,#2d5a8e 66%,#3d7a9e 100%);padding:36px 32px 0;position:relative;overflow:hidden">
-  <div style="max-width:1920px;margin:0 auto">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:24px">
-      <div>
-        <h1 style="font-size:32px;font-weight:800;color:#fff;letter-spacing:-0.5px;text-shadow:0 2px 8px rgba(0,0,0,0.4)">⛰️ Sprint Status Dashboard</h1>
-        <p style="margin-top:8px;font-size:14px;color:#93c5fd;font-weight:500">Web Programs Development &nbsp;·&nbsp; June 26, 2026 &nbsp;·&nbsp; opentexthq.atlassian.net</p>
-        <p style="margin-top:8px;font-size:12px;color:#64b5f6">🔄 Last refreshed: <span id="last-refreshed" style="font-weight:600"></span></p>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
-        <span style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);border-radius:20px;padding:6px 16px;font-size:12px;font-weight:600;color:#e0f2fe;backdrop-filter:blur(4px)">🏕️ Current Sprint Only · WPD</span>
-        <span style="background:rgba(129,199,132,0.15);border:1px solid rgba(129,199,132,0.4);border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;color:#81c784">53 Active Tickets</span>
-      </div>
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-content">
+      <h1>&#x26F0;&#xFE0F; Trail Status Dashboard</h1>
+      <div class="subtitle">Web Programs Development &middot; June 24, 2026 &middot; opentexthq.atlassian.net</div>
+      <span class="badge">&#x1F3D5;&#xFE0F; Current Sprint Only &middot; WPD</span>
     </div>
-  </div>
-  <svg viewBox="0 0 1440 120" preserveAspectRatio="none" style="display:block;width:100%;height:80px;margin-top:8px">
-    <path d="M0,90 L80,60 L150,80 L250,30 L340,70 L420,20 L500,60 L580,40 L660,75 L740,10 L820,55 L900,35 L980,65 L1060,15 L1140,50 L1220,30 L1320,70 L1440,40 L1440,120 L0,120 Z" fill="#1a3a5c" opacity="0.6"/>
-    <path d="M0,110 L60,85 L120,100 L200,60 L280,95 L380,50 L460,80 L520,65 L620,95 L700,40 L800,75 L880,55 L960,90 L1040,45 L1140,80 L1220,55 L1320,85 L1440,65 L1440,120 L0,120 Z" fill="#152535"/>
-    <path d="M700,40 L720,18 L740,40 Z" fill="#fff" opacity="0.9"/>
-  </svg>
-</div>
-
-<div style="max-width:1920px;margin:0 auto;padding:24px 24px 40px">
+    <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+      <path d="M0,90 L80,60 L150,80 L250,30 L340,70 L420,20 L500,60 L580,40 L660,75 L740,10 L820,55 L900,35 L980,65 L1060,15 L1140,50 L1220,30 L1320,70 L1440,40 L1440,120 L0,120 Z" fill="#1a3a5c" opacity="0.6"/>
+      <path d="M0,110 L60,85 L120,100 L200,60 L280,95 L380,50 L460,80 L520,65 L620,95 L700,40 L800,75 L880,55 L960,90 L1040,45 L1140,80 L1220,55 L1320,85 L1440,65 L1440,120 L0,120 Z" fill="#152535"/>
+      <path d="M700,40 L720,18 L740,40 Z" fill="#fff" opacity="0.9"/>
+    </svg>
+  </header>
 
   <!-- STATS BAR -->
-  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:28px;justify-content:space-between">
-    <div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:12px 10px;text-align:center;border:1px solid #ce93d844;min-width:100px">
-  <div style="font-size:18px;margin-bottom:4px">🎨</div>
-  <div style="font-size:22px;font-weight:800;color:#ce93d8;line-height:1">3</div>
-  <div style="font-size:10px;color:#94a3b8;margin-top:4px;line-height:1.3">UX In Progress</div>
-</div><div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:12px 10px;text-align:center;border:1px solid #4dd0e144;min-width:100px">
-  <div style="font-size:18px;margin-bottom:4px">🖌️</div>
-  <div style="font-size:22px;font-weight:800;color:#4dd0e1;line-height:1">5</div>
-  <div style="font-size:10px;color:#94a3b8;margin-top:4px;line-height:1.3">Design Review</div>
-</div><div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:12px 10px;text-align:center;border:1px solid #80deea44;min-width:100px">
-  <div style="font-size:18px;margin-bottom:4px">👀</div>
-  <div style="font-size:22px;font-weight:800;color:#80deea;line-height:1">0</div>
-  <div style="font-size:10px;color:#94a3b8;margin-top:4px;line-height:1.3">Dev Design Review</div>
-</div><div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:12px 10px;text-align:center;border:1px solid #5b8fa844;min-width:100px">
-  <div style="font-size:18px;margin-bottom:4px">🥾</div>
-  <div style="font-size:22px;font-weight:800;color:#5b8fa8;line-height:1">19</div>
-  <div style="font-size:10px;color:#94a3b8;margin-top:4px;line-height:1.3">In Progress</div>
-</div><div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:12px 10px;text-align:center;border:1px solid #ffb74d44;min-width:100px">
-  <div style="font-size:18px;margin-bottom:4px">🔍</div>
-  <div style="font-size:22px;font-weight:800;color:#ffb74d;line-height:1">2</div>
-  <div style="font-size:10px;color:#94a3b8;margin-top:4px;line-height:1.3">Code Review</div>
-</div><div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:12px 10px;text-align:center;border:1px solid #e5737344;min-width:100px">
-  <div style="font-size:18px;margin-bottom:4px">🪨</div>
-  <div style="font-size:22px;font-weight:800;color:#e57373;line-height:1">8</div>
-  <div style="font-size:10px;color:#94a3b8;margin-top:4px;line-height:1.3">Blocked</div>
-</div><div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:12px 10px;text-align:center;border:1px solid #aed58144;min-width:100px">
-  <div style="font-size:18px;margin-bottom:4px">📋</div>
-  <div style="font-size:22px;font-weight:800;color:#aed581;line-height:1">0</div>
-  <div style="font-size:10px;color:#94a3b8;margin-top:4px;line-height:1.3">Ready for QA</div>
-</div><div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:12px 10px;text-align:center;border:1px solid #e8a83844;min-width:100px">
-  <div style="font-size:18px;margin-bottom:4px">🔭</div>
-  <div style="font-size:22px;font-weight:800;color:#e8a838;line-height:1">3</div>
-  <div style="font-size:10px;color:#94a3b8;margin-top:4px;line-height:1.3">QA In Progress</div>
-</div><div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:12px 10px;text-align:center;border:1px solid #ef9a9a44;min-width:100px">
-  <div style="font-size:18px;margin-bottom:4px">❌</div>
-  <div style="font-size:22px;font-weight:800;color:#ef9a9a;line-height:1">6</div>
-  <div style="font-size:10px;color:#94a3b8;margin-top:4px;line-height:1.3">QA Failed</div>
-</div><div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:12px 10px;text-align:center;border:1px solid #81c78444;min-width:100px">
-  <div style="font-size:18px;margin-bottom:4px">🏔️</div>
-  <div style="font-size:22px;font-weight:800;color:#81c784;line-height:1">7</div>
-  <div style="font-size:10px;color:#94a3b8;margin-top:4px;line-height:1.3">Ready for Prod</div>
-</div>
+  <div class="stats-bar">
+    <div class="stat-box">
+      <div class="count c-ip">18</div>
+      <div class="label">&#x1F97E; In Progress</div>
+    </div>
+    <div class="stat-box">
+      <div class="count c-bl">8</div>
+      <div class="label">&#x1FAA8; Blocked</div>
+    </div>
+    <div class="stat-box">
+      <div class="count c-qa">0</div>
+      <div class="label">&#x1F52D; QA In Progress</div>
+    </div>
+    <div class="stat-box">
+      <div class="count c-rp">0</div>
+      <div class="label">&#x1F3D4;&#xFE0F; Ready for Prod</div>
+    </div>
   </div>
 
   <!-- BOARD -->
-  <div class="section-card" style="padding:16px">
-    <div class="section-title">🗂️ Board — Current Sprint</div>
-    <div style="overflow-x:auto;padding-bottom:8px">
-      <div style="display:grid;grid-template-columns:repeat(10,minmax(205px,1fr));gap:10px;min-width:1900px">
-        <div id="col-ux" style="background:linear-gradient(180deg,#6a1b9a22 0%,#6a1b9a11 100%);border-radius:10px;border:1px solid #ce93d844;display:flex;flex-direction:column;min-height:120px">
-  <div style="padding:10px 12px 8px;border-bottom:1px solid #ce93d844;background:#6a1b9a33;border-radius:10px 10px 0 0;sticky;top:0">
-    <div style="font-size:13px;font-weight:700;color:#ce93d8;display:flex;justify-content:space-between;align-items:center">
-      <span>🎨 UX In Progress</span>
-      <span style="background:#ce93d833;color:#ce93d8;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700">3</span>
-    </div>
-  </div>
-  <div class="col-body" style="padding:10px;overflow-y:auto;max-height:600px;flex:1">
-    <div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4446" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4446</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[UX] Review the 7 prototype pages and deliver UX recommendations (Due July 7th)</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#4a0000;color:#ff8a8a;border:1px solid #c53030;display:inline-block">▲▲ Highest</span>
-    </div>
-    <div title="Gustavo Polo" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#ab47bc;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">GP</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4445" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4445</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[UX] Review the 7 prototype pages and deliver UX recommendations (Due July 7th)</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#4a0000;color:#ff8a8a;border:1px solid #c53030;display:inline-block">▲▲ Highest</span>
-    </div>
-    <div title="Patrick Galego" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#26a69a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">PG</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4355" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4355</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">Claude Sprint 78</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Gustavo Polo" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#ab47bc;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">GP</div>
-  </div>
-</div>
-  </div>
-</div>
-<div id="col-dr" style="background:linear-gradient(180deg,#00838f22 0%,#00838f11 100%);border-radius:10px;border:1px solid #4dd0e144;display:flex;flex-direction:column;min-height:120px">
-  <div style="padding:10px 12px 8px;border-bottom:1px solid #4dd0e144;background:#00838f33;border-radius:10px 10px 0 0;sticky;top:0">
-    <div style="font-size:13px;font-weight:700;color:#4dd0e1;display:flex;justify-content:space-between;align-items:center">
-      <span>🖌️ Design Review</span>
-      <span style="background:#4dd0e133;color:#4dd0e1;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700">5</span>
-    </div>
-  </div>
-  <div class="col-body" style="padding:10px;overflow-y:auto;max-height:600px;flex:1">
-    <div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4443" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4443</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[QA Env] WPD4112_bug5 Review space between Tag and X in Customer stories</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Gustavo Polo" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#ab47bc;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">GP</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4410" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4410</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[UX] Explore alternative customer story card designs to reduce card height</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Patrick Galego" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#26a69a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">PG</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4344" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4344</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[UX] Update to logos on cards</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Unassigned" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#78909c;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">?</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4312" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4312</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[UX] Customer Stories Filtering research 2</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Patrick Galego" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#26a69a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">PG</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-3883" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-3883</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[UX] Events &amp; Webinars Design Updates Part 2</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Patrick Galego" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#26a69a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">PG</div>
-  </div>
-</div>
-  </div>
-</div>
-<div id="col-ddr" style="background:linear-gradient(180deg,#00606422 0%,#00606411 100%);border-radius:10px;border:1px solid #80deea44;display:flex;flex-direction:column;min-height:120px">
-  <div style="padding:10px 12px 8px;border-bottom:1px solid #80deea44;background:#00606433;border-radius:10px 10px 0 0;sticky;top:0">
-    <div style="font-size:13px;font-weight:700;color:#80deea;display:flex;justify-content:space-between;align-items:center">
-      <span>👀 Dev Design Review</span>
-      <span style="background:#80deea33;color:#80deea;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700">0</span>
-    </div>
-  </div>
-  <div class="col-body" style="padding:10px;overflow-y:auto;max-height:600px;flex:1">
-    <div style="text-align:center;padding:20px 10px;color:#4a7a9b;font-size:20px">🌨️<br><span style="font-size:12px;display:block;margin-top:6px">Clear</span></div>
-  </div>
-</div>
-<div id="col-ip" style="background:linear-gradient(180deg,#1a4a7a22 0%,#1a4a7a11 100%);border-radius:10px;border:1px solid #5b8fa844;display:flex;flex-direction:column;min-height:120px">
-  <div style="padding:10px 12px 8px;border-bottom:1px solid #5b8fa844;background:#1a4a7a33;border-radius:10px 10px 0 0;sticky;top:0">
-    <div style="font-size:13px;font-weight:700;color:#5b8fa8;display:flex;justify-content:space-between;align-items:center">
-      <span>🥾 In Progress</span>
-      <span style="background:#5b8fa833;color:#5b8fa8;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700">19</span>
-    </div>
-  </div>
-  <div class="col-body" style="padding:10px;overflow-y:auto;max-height:600px;flex:1">
-    <div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4403" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4403</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[FE] Dry Run of Launch</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#4a0000;color:#ff8a8a;border:1px solid #c53030;display:inline-block">▲▲ Highest</span>
-    </div>
-    <div title="Chris Schultz" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#ff7043;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">CS</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4353" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4353</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#4a0000;color:#ff8a8a;border:1px solid #c53030;display:inline-block">▲▲ Highest</span>
-    </div>
-    <div title="Nick Karch" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#5c6bc0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">NK</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4352" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4352</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#4a0000;color:#ff8a8a;border:1px solid #c53030;display:inline-block">▲▲ Highest</span>
-    </div>
-    <div title="Chris Schultz" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#ff7043;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">CS</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-3655" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-3655</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[FE] Global Font Change to accommodate for longer translations</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#4a0000;color:#ff8a8a;border:1px solid #c53030;display:inline-block">▲▲ Highest</span>
-    </div>
-    <div title="Nick Karch" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#5c6bc0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">NK</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4451" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4451</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[QA Env] Blogs | Database bloat is still higher than expected</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#3d1a00;color:#ffb74d;border:1px solid #c05621;display:inline-block">▲ High</span>
-    </div>
-    <div title="Chris Schultz" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#ff7043;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">CS</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4364" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4364</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[CRITICAL] [QA Env] Blogs QA | Homepage - Issues in Performance, Accessibility, w3c validator scans</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#3d1a00;color:#ffb74d;border:1px solid #c05621;display:inline-block">▲ High</span>
-    </div>
-    <div title="Unassigned" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#78909c;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">?</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4434" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4434</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">(ot.digital) Enablement production push</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Nageswara Rao Recharla" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#26a69a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">NR</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4381" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4381</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[FE] Social Share capability</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Chris Schultz" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#ff7043;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">CS</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4359" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4359</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">Claude Sprint 78</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Nageswara Rao Recharla" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#26a69a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">NR</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4358" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4358</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">Claude Sprint 78</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Krishna Kodicherla" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#ef5350;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">KK</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4357" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4357</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">Claude Sprint 78</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Ganesh Abothula" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#42a5f5;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">GA</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4356" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4356</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">Claude Sprint 78</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Lenin johnson" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#66bb6a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">LJ</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4346" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4346</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[Prod] JP - Press Release filtering does not work for By Product category</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Ganesh Abothula" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#42a5f5;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">GA</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4237" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4237</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[Content] (C19 Update) Marquee on Homepage Blip Resolution</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Jenny Luke" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#78909c;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">JL</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-3963" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-3963</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[Dev QA] | solutions.ot.com | fr | homepage, information mgmt, predictive maintenance page | In &quot;Contact Us&quot; form the mobile number field not optimized for 10-digit number</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Jean Alexandre" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#78909c;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">JA</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-3899" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-3899</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[FE][BP2] Apply new color and typography tokens to tooltip component</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Chris Schultz" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#ff7043;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">CS</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-3773" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-3773</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[FE] Update C36m to reflect to updates made to C36</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Nick Karch" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#5c6bc0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">NK</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-3593" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-3593</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">(Apps) Search results updates</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Lenin johnson" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#66bb6a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">LJ</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4363" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4363</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[NOT CRITICAL] [QA Env] Blogs QA | Viewport testing | Observations</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#1a1a1a;color:#a0aec0;border:1px solid #718096;display:inline-block">▼▼ Lowest</span>
-    </div>
-    <div title="Chris Schultz" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#ff7043;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">CS</div>
-  </div>
-</div>
-  </div>
-</div>
-<div id="col-cr" style="background:linear-gradient(180deg,#7a300022 0%,#7a300011 100%);border-radius:10px;border:1px solid #ffb74d44;display:flex;flex-direction:column;min-height:120px">
-  <div style="padding:10px 12px 8px;border-bottom:1px solid #ffb74d44;background:#7a300033;border-radius:10px 10px 0 0;sticky;top:0">
-    <div style="font-size:13px;font-weight:700;color:#ffb74d;display:flex;justify-content:space-between;align-items:center">
-      <span>🔍 Code Review</span>
-      <span style="background:#ffb74d33;color:#ffb74d;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700">2</span>
-    </div>
-  </div>
-  <div class="col-body" style="padding:10px;overflow-y:auto;max-height:600px;flex:1">
-    <div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4349" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4349</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[FE] Update Enablement Design</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#4a0000;color:#ff8a8a;border:1px solid #c53030;display:inline-block">▲▲ Highest</span>
-    </div>
-    <div title="Nick Karch" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#5c6bc0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">NK</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4322" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4322</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[DMTH] - Oncrawl finding - count of slow pages is up</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#3d1a00;color:#ffb74d;border:1px solid #c05621;display:inline-block">▲ High</span>
-    </div>
-    <div title="Jean Alexandre" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#78909c;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">JA</div>
-  </div>
-</div>
-  </div>
-</div>
-<div id="col-bl" style="background:linear-gradient(180deg,#7a151522 0%,#7a151511 100%);border-radius:10px;border:1px solid #e5737344;display:flex;flex-direction:column;min-height:120px">
-  <div style="padding:10px 12px 8px;border-bottom:1px solid #e5737344;background:#7a151533;border-radius:10px 10px 0 0;sticky;top:0">
-    <div style="font-size:13px;font-weight:700;color:#e57373;display:flex;justify-content:space-between;align-items:center">
-      <span>🪨 Blocked</span>
-      <span style="background:#e5737333;color:#e57373;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700">8</span>
-    </div>
-  </div>
-  <div class="col-body" style="padding:10px;overflow-y:auto;max-height:600px;flex:1">
-    <div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4287" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4287</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[BE] Evaluate Fix for longer translations</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#4a0000;color:#ff8a8a;border:1px solid #c53030;display:inline-block">▲▲ Highest</span>
-    </div>
-    <div title="Krishna Kodicherla" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#ef5350;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">KK</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4206" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4206</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[FE][BP2] Research for Prefixing tailwind classes</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#3d1a00;color:#ffb74d;border:1px solid #c05621;display:inline-block">▲ High</span>
-    </div>
-    <div title="Nick Karch" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#5c6bc0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">NK</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4078" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4078</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[WEB CMS] New C44.5 Variant</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#3d1a00;color:#ffb74d;border:1px solid #c05621;display:inline-block">▲ High</span>
-    </div>
-    <div title="Ganesh Abothula" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#42a5f5;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">GA</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-3902" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-3902</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[FE] Dynamic Footer + Header</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#3d1a00;color:#ffb74d;border:1px solid #c05621;display:inline-block">▲ High</span>
-    </div>
-    <div title="Nick Karch" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#5c6bc0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">NK</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4323" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4323</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[DMTH] - changes to publish workflow</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Srinivas Jayaram Rao" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#8d6e63;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">SJ</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4288" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4288</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[WEB CMS] Customer Story DCR update script for logo revamp</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Krishna Kodicherla" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#ef5350;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">KK</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4194" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4194</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[FE][BP2] Add avatar component</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Chris Schultz" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#ff7043;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">CS</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-3564" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-3564</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[FE][BP2] Table Component</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Chris Schultz" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#ff7043;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">CS</div>
-  </div>
-</div>
-  </div>
-</div>
-<div id="col-rfqa" style="background:linear-gradient(180deg,#2d5a1b22 0%,#2d5a1b11 100%);border-radius:10px;border:1px solid #aed58144;display:flex;flex-direction:column;min-height:120px">
-  <div style="padding:10px 12px 8px;border-bottom:1px solid #aed58144;background:#2d5a1b33;border-radius:10px 10px 0 0;sticky;top:0">
-    <div style="font-size:13px;font-weight:700;color:#aed581;display:flex;justify-content:space-between;align-items:center">
-      <span>📋 Ready for QA</span>
-      <span style="background:#aed58133;color:#aed581;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700">0</span>
-    </div>
-  </div>
-  <div class="col-body" style="padding:10px;overflow-y:auto;max-height:600px;flex:1">
-    <div style="text-align:center;padding:20px 10px;color:#4a7a9b;font-size:20px">🌨️<br><span style="font-size:12px;display:block;margin-top:6px">Clear</span></div>
-  </div>
-</div>
-<div id="col-qa" style="background:linear-gradient(180deg,#7a500022 0%,#7a500011 100%);border-radius:10px;border:1px solid #e8a83844;display:flex;flex-direction:column;min-height:120px">
-  <div style="padding:10px 12px 8px;border-bottom:1px solid #e8a83844;background:#7a500033;border-radius:10px 10px 0 0;sticky;top:0">
-    <div style="font-size:13px;font-weight:700;color:#e8a838;display:flex;justify-content:space-between;align-items:center">
-      <span>🔭 QA In Progress</span>
-      <span style="background:#e8a83833;color:#e8a838;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700">3</span>
-    </div>
-  </div>
-  <div class="col-body" style="padding:10px;overflow-y:auto;max-height:600px;flex:1">
-    <div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4257" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4257</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[WEB CMS] Create new skin for SaaS navigation</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#4a0000;color:#ff8a8a;border:1px solid #c53030;display:inline-block">▲▲ Highest</span>
-    </div>
-    <div title="Krishna Kodicherla" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#ef5350;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">KK</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4464" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4464</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[WEB CMS] Set up DCR for secondary navigation on SaaS pages</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Swetha Kalluri" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#26c6da;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">SK</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4111" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4111</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[CS Datasource] Develop utility to auto-update feed JSON</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Srinivas Jayaram Rao" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#8d6e63;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">SJ</div>
-  </div>
-</div>
-  </div>
-</div>
-<div id="col-qaf" style="background:linear-gradient(180deg,#6b000022 0%,#6b000011 100%);border-radius:10px;border:1px solid #ef9a9a44;display:flex;flex-direction:column;min-height:120px">
-  <div style="padding:10px 12px 8px;border-bottom:1px solid #ef9a9a44;background:#6b000033;border-radius:10px 10px 0 0;sticky;top:0">
-    <div style="font-size:13px;font-weight:700;color:#ef9a9a;display:flex;justify-content:space-between;align-items:center">
-      <span>❌ QA Failed</span>
-      <span style="background:#ef9a9a33;color:#ef9a9a;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700">6</span>
-    </div>
-  </div>
-  <div class="col-body" style="padding:10px;overflow-y:auto;max-height:600px;flex:1">
-    <div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4362" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4362</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">Exploratory Testing</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Srinivas Jayaram Rao" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#8d6e63;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">SJ</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4350" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4350</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">Viewport Testing</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Swetha Kalluri" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#26c6da;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">SK</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4343" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4343</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">Language switching and browser detection</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Srinivas Jayaram Rao" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#8d6e63;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">SJ</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4342" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4342</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">Performance Testing</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Srinivas Jayaram Rao" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#8d6e63;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">SJ</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4341" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4341</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">Contact brings users to form</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Srinivas Jayaram Rao" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#8d6e63;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">SJ</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4340" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4340</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">Social Sharing</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Srinivas Jayaram Rao" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#8d6e63;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">SJ</div>
-  </div>
-</div>
-  </div>
-</div>
-<div id="col-rp" style="background:linear-gradient(180deg,#0e4a2522 0%,#0e4a2511 100%);border-radius:10px;border:1px solid #81c78444;display:flex;flex-direction:column;min-height:120px">
-  <div style="padding:10px 12px 8px;border-bottom:1px solid #81c78444;background:#0e4a2533;border-radius:10px 10px 0 0;sticky;top:0">
-    <div style="font-size:13px;font-weight:700;color:#81c784;display:flex;justify-content:space-between;align-items:center">
-      <span>🏔️ Ready for PROD</span>
-      <span style="background:#81c78433;color:#81c784;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700">7</span>
-    </div>
-  </div>
-  <div class="col-body" style="padding:10px;overflow-y:auto;max-height:600px;flex:1">
-    <div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4405" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4405</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[QA Env] Creating a News Release with JP title in JP locale gives error</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Ganesh Abothula" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#42a5f5;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">GA</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4336" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4336</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[DMTH] - subnav relative path link does not work any more</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Ganesh Abothula" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#42a5f5;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">GA</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4296" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4296</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[DMTH] - Add the year 2026 to In the News dropdown filters</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Ganesh Abothula" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#42a5f5;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">GA</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4258" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4258</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[WEB CMS] Remove language switcher from SaaS footer and add to header</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Krishna Kodicherla" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#ef5350;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">KK</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4169" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4169</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">DMTH - [prod-red] WebCMS Upgrade 25.4 | TinyMCE rendering too small in C04 and C16</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Krishna Kodicherla" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#ef5350;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">KK</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-4072" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-4072</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[WEB CMS] Implementation - Simplify Demo Card Layout &amp; Support YouTube Modals - Demo Resources API</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Krishna Kodicherla" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#ef5350;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">KK</div>
-  </div>
-</div>
-<div style="background:rgba(255,255,255,0.06);border-radius:7px;padding:10px 11px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08);transition:border-color 0.2s">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px">
-    <div style="flex:1;min-width:0">
-      <a href="https://opentexthq.atlassian.net/browse/WPD-3880" target="_blank" style="font-size:11px;font-weight:700;color:#90cdf4;text-decoration:none;font-family:monospace;letter-spacing:0.4px">WPD-3880</a>
-      <p style="margin:4px 0 7px;font-size:12px;color:#cbd5e0;line-height:1.4;word-break:break-word">[BE] Implment classes &amp; id&#x27;s to elements to be tracked by GA4</p>
-      <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;background:#2d2200;color:#f6c90e;border:1px solid #b7791f;display:inline-block">● Medium</span>
-    </div>
-    <div title="Krishna Kodicherla" style="min-width:28px;width:28px;height:28px;border-radius:50%;background:#ef5350;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;cursor:default;margin-top:1px">KK</div>
-  </div>
-</div>
-  </div>
-</div>
-
+  <div class="board">
+      <div class="column col-in-progress">
+        <div class="col-header">
+          <span>🥾 In Progress</span>
+          <span class="col-count">18</span>
+        </div>
+        <div class="col-body">
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4451" target="_blank" rel="noopener">WPD-4451</a></div>
+          <div class="card-summary">[QA Env] Blogs | Database bloat is still higher than expected</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#5c6bc0" title="Chris Schultz">CS</div>
+            <span class="assignee-name">Chris Schultz</span>
+            <span class="priority-badge" style="background:#e64a19">High</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4434" target="_blank" rel="noopener">WPD-4434</a></div>
+          <div class="card-summary">(ot.digital) Enablement production push</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#26a69a" title="Nageswara Rao Recharla">NR</div>
+            <span class="assignee-name">Nageswara Rao Recharla</span>
+            <span class="priority-badge" style="background:#455a64">Medium</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4403" target="_blank" rel="noopener">WPD-4403</a></div>
+          <div class="card-summary">[FE] Dry Run of Launch</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#5c6bc0" title="Chris Schultz">CS</div>
+            <span class="assignee-name">Chris Schultz</span>
+            <span class="priority-badge" style="background:#c62828">Highest</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4381" target="_blank" rel="noopener">WPD-4381</a></div>
+          <div class="card-summary">[FE] Social Share capability </div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#5c6bc0" title="Chris Schultz">CS</div>
+            <span class="assignee-name">Chris Schultz</span>
+            <span class="priority-badge" style="background:#455a64">Medium</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4364" target="_blank" rel="noopener">WPD-4364</a></div>
+          <div class="card-summary">[CRITICAL] [QA Env] Blogs QA | Homepage - Issues in Performance, Accessibility, w3c validator scans</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#ef5350" title="Unassigned">UN</div>
+            <span class="assignee-name">Unassigned</span>
+            <span class="priority-badge" style="background:#e64a19">High</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4359" target="_blank" rel="noopener">WPD-4359</a></div>
+          <div class="card-summary">Claude Sprint 78</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#26a69a" title="Nageswara Rao Recharla">NR</div>
+            <span class="assignee-name">Nageswara Rao Recharla</span>
+            <span class="priority-badge" style="background:#455a64">Medium</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4358" target="_blank" rel="noopener">WPD-4358</a></div>
+          <div class="card-summary">Claude Sprint 78</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#ff7043" title="Krishna Kodicherla">KK</div>
+            <span class="assignee-name">Krishna Kodicherla</span>
+            <span class="priority-badge" style="background:#455a64">Medium</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4357" target="_blank" rel="noopener">WPD-4357</a></div>
+          <div class="card-summary">Claude Sprint 78</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#66bb6a" title="Ganesh Abothula">GA</div>
+            <span class="assignee-name">Ganesh Abothula</span>
+            <span class="priority-badge" style="background:#455a64">Medium</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4356" target="_blank" rel="noopener">WPD-4356</a></div>
+          <div class="card-summary">Claude Sprint 78</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#42a5f5" title="Lenin johnson">LJ</div>
+            <span class="assignee-name">Lenin johnson</span>
+            <span class="priority-badge" style="background:#455a64">Medium</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4353" target="_blank" rel="noopener">WPD-4353</a></div>
+          <div class="card-summary">[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#ab47bc" title="Nick Karch">NK</div>
+            <span class="assignee-name">Nick Karch</span>
+            <span class="priority-badge" style="background:#c62828">Highest</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4352" target="_blank" rel="noopener">WPD-4352</a></div>
+          <div class="card-summary">[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#5c6bc0" title="Chris Schultz">CS</div>
+            <span class="assignee-name">Chris Schultz</span>
+            <span class="priority-badge" style="background:#c62828">Highest</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4346" target="_blank" rel="noopener">WPD-4346</a></div>
+          <div class="card-summary">[Prod] JP - Press Release filtering does not work for By Product category</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#66bb6a" title="Ganesh Abothula">GA</div>
+            <span class="assignee-name">Ganesh Abothula</span>
+            <span class="priority-badge" style="background:#455a64">Medium</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4237" target="_blank" rel="noopener">WPD-4237</a></div>
+          <div class="card-summary">[Content] (C19 Update) Marquee on Homepage Blip Resolution</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#8d6e63" title="Jenny Luke">JL</div>
+            <span class="assignee-name">Jenny Luke</span>
+            <span class="priority-badge" style="background:#455a64">Medium</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3963" target="_blank" rel="noopener">WPD-3963</a></div>
+          <div class="card-summary">[Dev QA] | solutions.ot.com | fr | homepage, information mgmt, predictive maintenance page | iPhone | In "Contact Us" form the mobile number field not optimized for 10-digit number</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#26c6da" title="Jean Alexandre">JA</div>
+            <span class="assignee-name">Jean Alexandre</span>
+            <span class="priority-badge" style="background:#455a64">Medium</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3899" target="_blank" rel="noopener">WPD-3899</a></div>
+          <div class="card-summary">[FE][BP2] Apply new color and typography tokens to tooltip component </div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#5c6bc0" title="Chris Schultz">CS</div>
+            <span class="assignee-name">Chris Schultz</span>
+            <span class="priority-badge" style="background:#455a64">Medium</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3773" target="_blank" rel="noopener">WPD-3773</a></div>
+          <div class="card-summary">[FE] Update C36m to reflect to updates made to C36</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#ab47bc" title="Nick Karch">NK</div>
+            <span class="assignee-name">Nick Karch</span>
+            <span class="priority-badge" style="background:#455a64">Medium</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3655" target="_blank" rel="noopener">WPD-3655</a></div>
+          <div class="card-summary">[FE] Global Font Change to accommodate for longer translations </div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#ab47bc" title="Nick Karch">NK</div>
+            <span class="assignee-name">Nick Karch</span>
+            <span class="priority-badge" style="background:#c62828">Highest</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3593" target="_blank" rel="noopener">WPD-3593</a></div>
+          <div class="card-summary">(Apps) Search results updates</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#42a5f5" title="Lenin johnson">LJ</div>
+            <span class="assignee-name">Lenin johnson</span>
+            <span class="priority-badge" style="background:#455a64">Medium</span>
+          </div>
+        </div>
+        </div>
       </div>
-    </div>
+      <div class="column col-blocked">
+        <div class="col-header">
+          <span>🪨 Blocked</span>
+          <span class="col-count">8</span>
+        </div>
+        <div class="col-body">
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4323" target="_blank" rel="noopener">WPD-4323</a></div>
+          <div class="card-summary">[DMTH] - changes to publish workflow</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#5c6bc0" title="Srinivas Jayaram Rao">SR</div>
+            <span class="assignee-name">Srinivas Jayaram Rao</span>
+            <span class="priority-badge" style="background:#455a64">Medium</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4288" target="_blank" rel="noopener">WPD-4288</a></div>
+          <div class="card-summary">[WEB CMS] Customer Story DCR update script for logo revamp</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#ff7043" title="Krishna Kodicherla">KK</div>
+            <span class="assignee-name">Krishna Kodicherla</span>
+            <span class="priority-badge" style="background:#455a64">Medium</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4287" target="_blank" rel="noopener">WPD-4287</a></div>
+          <div class="card-summary">[BE] Evaluate Fix for longer translations</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#ff7043" title="Krishna Kodicherla">KK</div>
+            <span class="assignee-name">Krishna Kodicherla</span>
+            <span class="priority-badge" style="background:#c62828">Highest</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4206" target="_blank" rel="noopener">WPD-4206</a></div>
+          <div class="card-summary">[FE][BP2] Research for Prefixing tailwind classes</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#ab47bc" title="Nick Karch">NK</div>
+            <span class="assignee-name">Nick Karch</span>
+            <span class="priority-badge" style="background:#e64a19">High</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4194" target="_blank" rel="noopener">WPD-4194</a></div>
+          <div class="card-summary">[FE][BP2] Add avatar component </div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#5c6bc0" title="Chris Schultz">CS</div>
+            <span class="assignee-name">Chris Schultz</span>
+            <span class="priority-badge" style="background:#455a64">Medium</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4078" target="_blank" rel="noopener">WPD-4078</a></div>
+          <div class="card-summary">[WEB CMS] New C44.5 Variant </div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#66bb6a" title="Ganesh Abothula">GA</div>
+            <span class="assignee-name">Ganesh Abothula</span>
+            <span class="priority-badge" style="background:#e64a19">High</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3902" target="_blank" rel="noopener">WPD-3902</a></div>
+          <div class="card-summary">[FE] Dynamic Footer + Header</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#ab47bc" title="Nick Karch">NK</div>
+            <span class="assignee-name">Nick Karch</span>
+            <span class="priority-badge" style="background:#e64a19">High</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3564" target="_blank" rel="noopener">WPD-3564</a></div>
+          <div class="card-summary">[FE][BP2] Table Component</div>
+          <div class="card-meta">
+            <div class="avatar" style="background:#5c6bc0" title="Chris Schultz">CS</div>
+            <span class="assignee-name">Chris Schultz</span>
+            <span class="priority-badge" style="background:#455a64">Medium</span>
+          </div>
+        </div>
+        </div>
+      </div>
+      <div class="column col-qa">
+        <div class="col-header">
+          <span>🔭 QA In Progress</span>
+          <span class="col-count">0</span>
+        </div>
+        <div class="col-body">
+        <div class="empty-col"></div>
+        </div>
+      </div>
+      <div class="column col-ready">
+        <div class="col-header">
+          <span>🏔️ Ready for Prod</span>
+          <span class="col-count">0</span>
+        </div>
+        <div class="col-body">
+        <div class="empty-col">🌨️ The summit is clear. No tickets waiting for production.</div>
+        </div>
+      </div>
   </div>
 
-  <!-- TODAY WORKLOGS -->
-  <div class="section-card">
-    <div class="section-title">🌲 Time Logged — Today: Friday, Jun 26 2026</div>
-    <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:12px 14px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.08)">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-    <div title="Krishna Kodicherla" style="min-width:32px;width:32px;height:32px;border-radius:50%;background:#ef5350;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">KK</div>
-    <span style="font-size:13px;font-weight:700;color:#e2e8f0">Krishna Kodicherla</span>
-  </div>
-  <div style="display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-      <span style="font-family:monospace;font-size:11px;color:#90cdf4;white-space:nowrap"><a href="https://opentexthq.atlassian.net/browse/WPD-4441" target="_blank" style="color:#90cdf4;text-decoration:none">WPD-4441</a></span>
-      <span style="font-size:12px;color:#cbd5e0;flex:1;line-height:1.4">[QA Env] WPD4112_bug3 Tags with &#x27;&amp;&#x27; symbol not supported in By Industry, By Product dropdown</span>
-      <span style="font-size:11px;font-weight:700;color:#68d391;white-space:nowrap;font-family:monospace">3h 30m</span>
+  <!-- WORKLOG -->
+  <div class="worklog-section">
+    <div class="worklog-header">&#x1F332; Time Logged &mdash; Last Business Day &nbsp;&#x1F4C5; Tuesday, Jun 02 2026</div>
+    <div class="worklog-body">
+        <div class="worklog-grid">
+          <div class="worklog-person">
+            <div class="worklog-person-header">
+              <div class="worklog-avatar" style="background:#42a5f5">LJ</div>
+              <span class="worklog-person-name">Lenin johnson</span>
+            </div>
+            <div class="worklog-entries">
+              <div class="worklog-entry">
+                <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4266" target="_blank" rel="noopener">WPD-4266</a></div>
+                <div class="worklog-summary">Getting to know Claude</div>
+                <div class="worklog-time">3h</div>
+              </div>
+              <div class="worklog-entry">
+                <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4266" target="_blank" rel="noopener">WPD-4266</a></div>
+                <div class="worklog-summary">Getting to know Claude</div>
+                <div class="worklog-time">1d 1h</div>
+              </div>
+            </div>
+          </div>
+          <div class="worklog-person">
+            <div class="worklog-person-header">
+              <div class="worklog-avatar" style="background:#5c6bc0">CS</div>
+              <span class="worklog-person-name">Chris Schultz</span>
+            </div>
+            <div class="worklog-entries">
+              <div class="worklog-entry">
+                <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3564" target="_blank" rel="noopener">WPD-3564</a></div>
+                <div class="worklog-summary">[FE][BP2] Table Component</div>
+                <div class="worklog-time">2h</div>
+              </div>
+              <div class="worklog-entry">
+                <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4262" target="_blank" rel="noopener">WPD-4262</a></div>
+                <div class="worklog-summary">Getting to know Claude</div>
+                <div class="worklog-time">1h</div>
+              </div>
+              <div class="worklog-entry">
+                <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4194" target="_blank" rel="noopener">WPD-4194</a></div>
+                <div class="worklog-summary">[FE][BP2] Add avatar component</div>
+                <div class="worklog-time">1h 30m</div>
+              </div>
+            </div>
+          </div>
+          <div class="worklog-person">
+            <div class="worklog-person-header">
+              <div class="worklog-avatar" style="background:#ab47bc">NK</div>
+              <span class="worklog-person-name">Nick Karch</span>
+            </div>
+            <div class="worklog-entries">
+              <div class="worklog-entry">
+                <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3747" target="_blank" rel="noopener">WPD-3747</a></div>
+                <div class="worklog-summary">[FE] Update Language alert and gtm alert to work with BP2</div>
+                <div class="worklog-time">1d 30m</div>
+              </div>
+            </div>
+          </div>
+          <div class="worklog-person">
+            <div class="worklog-person-header">
+              <div class="worklog-avatar" style="background:#26a69a">PG</div>
+              <span class="worklog-person-name">Patrick Galego</span>
+            </div>
+            <div class="worklog-entries">
+              <div class="worklog-entry">
+                <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4274" target="_blank" rel="noopener">WPD-4274</a></div>
+                <div class="worklog-summary">Products Prototype</div>
+                <div class="worklog-time">4h</div>
+              </div>
+            </div>
+          </div>
+          <div class="worklog-person">
+            <div class="worklog-person-header">
+              <div class="worklog-avatar" style="background:#66bb6a">GA</div>
+              <span class="worklog-person-name">Ganesh Abothula</span>
+            </div>
+            <div class="worklog-entries">
+              <div class="worklog-entry">
+                <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4111" target="_blank" rel="noopener">WPD-4111</a></div>
+                <div class="worklog-summary">[CS Datasource] Develop utility to auto-update feed JSON</div>
+                <div class="worklog-time">1d</div>
+              </div>
+            </div>
+          </div>
+        </div>
     </div>
-</div>
-  </div>
-
-  <!-- YESTERDAY WORKLOGS -->
-  <div class="section-card">
-    <div class="section-title">🌲 Time Logged — Last Business Day: Thursday, Jun 25 2026</div>
-    <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:12px 14px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.08)">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-    <div title="Ganesh Abothula" style="min-width:32px;width:32px;height:32px;border-radius:50%;background:#42a5f5;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">GA</div>
-    <span style="font-size:13px;font-weight:700;color:#e2e8f0">Ganesh Abothula</span>
-  </div>
-  <div style="display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-      <span style="font-family:monospace;font-size:11px;color:#90cdf4;white-space:nowrap"><a href="https://opentexthq.atlassian.net/browse/WPD-4441" target="_blank" style="color:#90cdf4;text-decoration:none">WPD-4441</a></span>
-      <span style="font-size:12px;color:#cbd5e0;flex:1;line-height:1.4">[QA Env] WPD4112_bug3 Tags with &#x27;&amp;&#x27; symbol not supported in By Industry, By Product dropdown</span>
-      <span style="font-size:11px;font-weight:700;color:#68d391;white-space:nowrap;font-family:monospace">1h</span>
-    </div><div style="display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-      <span style="font-family:monospace;font-size:11px;color:#90cdf4;white-space:nowrap"><a href="https://opentexthq.atlassian.net/browse/WPD-4380" target="_blank" style="color:#90cdf4;text-decoration:none">WPD-4380</a></span>
-      <span style="font-size:12px;color:#cbd5e0;flex:1;line-height:1.4">Remove Analytics tag from Customer Story landing page filter</span>
-      <span style="font-size:11px;font-weight:700;color:#68d391;white-space:nowrap;font-family:monospace">3h</span>
-    </div><div style="display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-      <span style="font-family:monospace;font-size:11px;color:#90cdf4;white-space:nowrap"><a href="https://opentexthq.atlassian.net/browse/WPD-4452" target="_blank" style="color:#90cdf4;text-decoration:none">WPD-4452</a></span>
-      <span style="font-size:12px;color:#cbd5e0;flex:1;line-height:1.4">[QA Env] WPD4112_bug6 Customer Stories detail page opens in wrong state</span>
-      <span style="font-size:11px;font-weight:700;color:#68d391;white-space:nowrap;font-family:monospace">2h</span>
-    </div><div style="display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-      <span style="font-family:monospace;font-size:11px;color:#90cdf4;white-space:nowrap"><a href="https://opentexthq.atlassian.net/browse/WPD-4440" target="_blank" style="color:#90cdf4;text-decoration:none">WPD-4440</a></span>
-      <span style="font-size:12px;color:#cbd5e0;flex:1;line-height:1.4">[QA Env] WPD4112_bug2 By Region filter has &#x27;See more&#x27; link</span>
-      <span style="font-size:11px;font-weight:700;color:#68d391;white-space:nowrap;font-family:monospace">2h</span>
-    </div><div style="display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-      <span style="font-family:monospace;font-size:11px;color:#90cdf4;white-space:nowrap"><a href="https://opentexthq.atlassian.net/browse/WPD-4442" target="_blank" style="color:#90cdf4;text-decoration:none">WPD-4442</a></span>
-      <span style="font-size:12px;color:#cbd5e0;flex:1;line-height:1.4">[QA Env] WPD4112_bug4 UI overlap in By Products dropdown menu</span>
-      <span style="font-size:11px;font-weight:700;color:#68d391;white-space:nowrap;font-family:monospace">3h</span>
-    </div>
-</div><div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:12px 14px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.08)">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-    <div title="Jean Alexandre" style="min-width:32px;width:32px;height:32px;border-radius:50%;background:#78909c;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">JA</div>
-    <span style="font-size:13px;font-weight:700;color:#e2e8f0">Jean Alexandre</span>
-  </div>
-  <div style="display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-      <span style="font-family:monospace;font-size:11px;color:#90cdf4;white-space:nowrap"><a href="https://opentexthq.atlassian.net/browse/WPD-4438" target="_blank" style="color:#90cdf4;text-decoration:none">WPD-4438</a></span>
-      <span style="font-size:12px;color:#cbd5e0;flex:1;line-height:1.4">[QA Env] WPD4112_bug1 Component Exception for Dynamic List</span>
-      <span style="font-size:11px;font-weight:700;color:#68d391;white-space:nowrap;font-family:monospace">10m</span>
-    </div>
-</div><div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:12px 14px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.08)">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-    <div title="Krishna Kodicherla" style="min-width:32px;width:32px;height:32px;border-radius:50%;background:#ef5350;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">KK</div>
-    <span style="font-size:13px;font-weight:700;color:#e2e8f0">Krishna Kodicherla</span>
-  </div>
-  <div style="display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-      <span style="font-family:monospace;font-size:11px;color:#90cdf4;white-space:nowrap"><a href="https://opentexthq.atlassian.net/browse/WPD-4464" target="_blank" style="color:#90cdf4;text-decoration:none">WPD-4464</a></span>
-      <span style="font-size:12px;color:#cbd5e0;flex:1;line-height:1.4">[WEB CMS] Set up DCR for secondary navigation on SaaS pages</span>
-      <span style="font-size:11px;font-weight:700;color:#68d391;white-space:nowrap;font-family:monospace">5h</span>
-    </div>
-</div><div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:12px 14px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.08)">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-    <div title="Lenin johnson" style="min-width:32px;width:32px;height:32px;border-radius:50%;background:#66bb6a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">LJ</div>
-    <span style="font-size:13px;font-weight:700;color:#e2e8f0">Lenin johnson</span>
-  </div>
-  <div style="display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-      <span style="font-family:monospace;font-size:11px;color:#90cdf4;white-space:nowrap"><a href="https://opentexthq.atlassian.net/browse/WPD-4453" target="_blank" style="color:#90cdf4;text-decoration:none">WPD-4453</a></span>
-      <span style="font-size:12px;color:#cbd5e0;flex:1;line-height:1.4">[Wordpress] blogs.opentext.com - Archive/Delete blog posts in bulk</span>
-      <span style="font-size:11px;font-weight:700;color:#68d391;white-space:nowrap;font-family:monospace">2h</span>
-    </div>
-</div><div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:12px 14px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.08)">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-    <div title="Nageswara Rao Recharla" style="min-width:32px;width:32px;height:32px;border-radius:50%;background:#26a69a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">NR</div>
-    <span style="font-size:13px;font-weight:700;color:#e2e8f0">Nageswara Rao Recharla</span>
-  </div>
-  <div style="display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-      <span style="font-family:monospace;font-size:11px;color:#90cdf4;white-space:nowrap"><a href="https://opentexthq.atlassian.net/browse/WPD-4359" target="_blank" style="color:#90cdf4;text-decoration:none">WPD-4359</a></span>
-      <span style="font-size:12px;color:#cbd5e0;flex:1;line-height:1.4">Claude Sprint 78</span>
-      <span style="font-size:11px;font-weight:700;color:#68d391;white-space:nowrap;font-family:monospace">4h</span>
-    </div>
-</div><div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:12px 14px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.08)">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-    <div title="Nick Karch" style="min-width:32px;width:32px;height:32px;border-radius:50%;background:#5c6bc0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">NK</div>
-    <span style="font-size:13px;font-weight:700;color:#e2e8f0">Nick Karch</span>
-  </div>
-  <div style="display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-      <span style="font-family:monospace;font-size:11px;color:#90cdf4;white-space:nowrap"><a href="https://opentexthq.atlassian.net/browse/WPD-4353" target="_blank" style="color:#90cdf4;text-decoration:none">WPD-4353</a></span>
-      <span style="font-size:12px;color:#cbd5e0;flex:1;line-height:1.4">[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)</span>
-      <span style="font-size:11px;font-weight:700;color:#68d391;white-space:nowrap;font-family:monospace">6h</span>
-    </div>
-</div><div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:12px 14px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.08)">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-    <div title="Patrick Galego" style="min-width:32px;width:32px;height:32px;border-radius:50%;background:#26a69a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">PG</div>
-    <span style="font-size:13px;font-weight:700;color:#e2e8f0">Patrick Galego</span>
-  </div>
-  <div style="display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-      <span style="font-family:monospace;font-size:11px;color:#90cdf4;white-space:nowrap"><a href="https://opentexthq.atlassian.net/browse/WPD-4445" target="_blank" style="color:#90cdf4;text-decoration:none">WPD-4445</a></span>
-      <span style="font-size:12px;color:#cbd5e0;flex:1;line-height:1.4">[UX] Review the 7 prototype pages and deliver UX recommendations (Due July 7th)</span>
-      <span style="font-size:11px;font-weight:700;color:#68d391;white-space:nowrap;font-family:monospace">5h</span>
-    </div>
-</div>
   </div>
 
   <!-- FOOTER -->
-  <div style="text-align:center;padding:20px 0;color:#4a6a8a;font-size:12px;border-top:1px solid rgba(255,255,255,0.06);margin-top:8px">
-    ⛰️ Sprint Status Dashboard &nbsp;·&nbsp; Current Sprint &nbsp;·&nbsp; WPD &nbsp;·&nbsp; Generated 2026-06-26 08:01 MDT
-  </div>
+  <footer>
+    &#x26F0;&#xFE0F; Trail Status Dashboard &middot; Current Sprint &middot; WPD &middot; Time logged: last business day &middot; Generated 2026-06-26 14:07 MDT
+  </footer>
 
-</div>
-
-<script src="teams.js"></script>
 </body>
 </html>
