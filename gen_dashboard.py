@@ -33,19 +33,19 @@ in_progress = [
     {"key":"WPD-4356","summary":"Claude Sprint 78","assignee":"Lenin johnson","priority":"Medium"},
     {"key":"WPD-4353","summary":"[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)","assignee":"Nick Karch","priority":"Highest"},
     {"key":"WPD-4352","summary":"[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)","assignee":"Chris Schultz","priority":"Highest"},
-    {"key":"WPD-4346","summary":"[Prod] JP - Press Release filtering does not work for By Product category","assignee":"Ganesh Abothula","priority":"Medium"},
+    {"key":"WPD-4287","summary":"[BE] Evaluate Fix for longer translations","assignee":"Krishna Kodicherla","priority":"Highest"},
     {"key":"WPD-4237","summary":"[Content] (C19 Update) Marquee on Homepage Blip Resolution","assignee":"Jenny Luke","priority":"Medium"},
     {"key":"WPD-3963","summary":"[Dev QA] | solutions.ot.com | fr | homepage, information mgmt, predictive maintenance page | iPhone | In \"Contact Us\" form the mobile number field not optimized for 10-digit number","assignee":"Jean Alexandre","priority":"Medium"},
     {"key":"WPD-3899","summary":"[FE][BP2] Apply new color and typography tokens to tooltip component ","assignee":"Chris Schultz","priority":"Medium"},
-    {"key":"WPD-3773","summary":"[FE] Update C36m to reflect to updates made to C36","assignee":"Nick Karch","priority":"Medium"},
     {"key":"WPD-3655","summary":"[FE] Global Font Change to accommodate for longer translations ","assignee":"Nick Karch","priority":"Highest"},
     {"key":"WPD-3593","summary":"(Apps) Search results updates","assignee":"Lenin johnson","priority":"Medium"},
 ]
 
 blocked = [
+    {"key":"WPD-4380","summary":"Remove Analytics tag from Customer Story landing page filtering option","assignee":"Krishna Kodicherla","priority":"High","block_reason":""},
     {"key":"WPD-4323","summary":"[DMTH] - changes to publish workflow","assignee":"Srinivas Jayaram Rao","priority":"Medium","block_reason":""},
     {"key":"WPD-4288","summary":"[WEB CMS] Customer Story DCR update script for logo revamp","assignee":"Krishna Kodicherla","priority":"Medium","block_reason":""},
-    {"key":"WPD-4287","summary":"[BE] Evaluate Fix for longer translations","assignee":"Krishna Kodicherla","priority":"Highest","block_reason":""},
+    {"key":"WPD-4257","summary":"[WEB CMS] Create new skin for SaaS navigation ","assignee":"Jenny Luke","priority":"Highest","block_reason":""},
     {"key":"WPD-4206","summary":"[FE][BP2] Research for Prefixing tailwind classes","assignee":"Nick Karch","priority":"High","block_reason":""},
     {"key":"WPD-4194","summary":"[FE][BP2] Add avatar component ","assignee":"Chris Schultz","priority":"Medium","block_reason":""},
     {"key":"WPD-4078","summary":"[WEB CMS] New C44.5 Variant ","assignee":"Ganesh Abothula","priority":"High","block_reason":""},
@@ -333,7 +333,7 @@ html_out = f"""<!DOCTYPE html>
   <header class="hero">
     <div class="hero-content">
       <h1>&#x26F0;&#xFE0F; Trail Status Dashboard</h1>
-      <div class="subtitle">Web Programs Development &middot; June 24, 2026 &middot; opentexthq.atlassian.net</div>
+      <div class="subtitle">Web Programs Development &middot; June 29, 2026 &middot; opentexthq.atlassian.net</div>
       <span class="badge">&#x1F3D5;&#xFE0F; Current Sprint Only &middot; WPD</span>
     </div>
     <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
