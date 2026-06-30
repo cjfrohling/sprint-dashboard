@@ -2,652 +2,494 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>⛰️ Trail Status Dashboard — WPD</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #1a2f3a;
-    color: #d4e4f0;
-    min-height: 100vh;
-  }
+  body { background: #1a2f3a; color: #d0dde6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; min-height: 100vh; }
 
-  /* ── Hero ── */
-  .hero {
-    background: linear-gradient(135deg, #0d1b2a 0%, #1a3a5c 35%, #2d5a8e 70%, #3d7a9e 100%);
-    position: relative;
-    overflow: hidden;
-    padding: 2.5rem 2rem 0;
-    text-align: center;
-  }
-  .hero-text { position: relative; z-index: 2; padding-bottom: 1.5rem; }
-  .hero h1 { font-size: 2.4rem; font-weight: 700; color: #e8f4fd; letter-spacing: -0.02em; }
-  .hero .subtitle { color: #a8d0e6; font-size: 1rem; margin-top: .4rem; }
-  .hero .badge {
-    display: inline-block;
-    margin-top: .75rem;
-    background: rgba(255,255,255,.1);
-    border: 1px solid rgba(168,208,230,.3);
-    color: #a8d0e6;
-    font-size: .78rem;
-    padding: .3rem .85rem;
-    border-radius: 999px;
-    letter-spacing: .04em;
-  }
-  .mountain-svg { display: block; width: 100%; line-height: 0; }
+  /* HERO */
+  .hero { background: linear-gradient(135deg, #0d1b2a 0%, #1a3a5c 35%, #2d5a8e 70%, #3d7a9e 100%); position: relative; overflow: hidden; padding: 2.5rem 2rem 0; text-align: center; }
+  .hero-mountains { display: block; width: 100%; margin-top: 1.5rem; }
+  .hero h1 { font-size: 2.4rem; font-weight: 800; color: #e8f4fc; letter-spacing: -0.5px; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+  .hero-sub { color: #a8d0e6; font-size: 0.95rem; margin-top: 0.4rem; }
+  .hero-badge { display: inline-block; margin-top: 0.75rem; background: rgba(255,255,255,0.12); border: 1px solid rgba(168,208,230,0.3); color: #a8d0e6; border-radius: 20px; padding: 0.25rem 0.9rem; font-size: 0.8rem; backdrop-filter: blur(4px); }
 
-  /* ── Stats bar ── */
-  .stats-bar {
-    display: flex;
-    gap: 1rem;
-    padding: 1.25rem 2rem;
-    background: #152535;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  .stat-box {
-    background: #1e3a50;
-    border: 1px solid #2d5a8e;
-    border-radius: 10px;
-    padding: .75rem 1.5rem;
-    text-align: center;
-    min-width: 150px;
-    flex: 1 1 140px;
-    max-width: 220px;
-  }
-  .stat-box .stat-icon { font-size: 1.4rem; }
-  .stat-box .stat-count { font-size: 2rem; font-weight: 700; color: #e8f4fd; line-height: 1.1; }
-  .stat-box .stat-label { font-size: .75rem; color: #8b9ba8; text-transform: uppercase; letter-spacing: .06em; }
-  .stat-box.ip .stat-count  { color: #5b8fa8; }
-  .stat-box.bl .stat-count  { color: #e57373; }
-  .stat-box.qa .stat-count  { color: #e8a838; }
-  .stat-box.rfp .stat-count { color: #81c784; }
+  /* STATS BAR */
+  .stats-bar { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; padding: 1.5rem 1.5rem 0; }
+  .stat-box { background: #2d4a5e; border-radius: 10px; padding: 1rem 1.5rem; text-align: center; min-width: 140px; border: 1px solid rgba(168,208,230,0.15); }
+  .stat-emoji { font-size: 1.5rem; }
+  .stat-count { font-size: 2rem; font-weight: 800; color: #e8f4fc; line-height: 1.1; }
+  .stat-label { font-size: 0.75rem; color: #8b9ba8; margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.5px; }
 
-  /* ── Main content ── */
-  .main { padding: 1.5rem 2rem 2rem; max-width: 1600px; margin: 0 auto; }
+  /* BOARD */
+  .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; padding: 1.5rem; }
+  @media (max-width: 900px) { .board { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .board { grid-template-columns: 1fr; } }
 
-  /* ── Board ── */
-  .board {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.25rem;
-    margin-bottom: 2rem;
-  }
-  @media (max-width: 1100px) { .board { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 640px)  { .board { grid-template-columns: 1fr; } }
+  .board-column { background: #2d4a5e; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
+  .col-header { display: flex; align-items: center; justify-content: space-between; padding: 0.7rem 1rem; }
+  .col-title { font-weight: 700; font-size: 0.9rem; color: #fff; }
+  .col-count { background: rgba(255,255,255,0.2); border-radius: 12px; padding: 0.1rem 0.55rem; font-size: 0.8rem; font-weight: 700; color: #fff; }
+  .col-body { padding: 0.75rem; display: flex; flex-direction: column; gap: 0.6rem; flex: 1; }
 
-  .column { display: flex; flex-direction: column; gap: .75rem; }
-  .col-header {
-    border-radius: 8px 8px 0 0;
-    padding: .65rem 1rem;
-    font-size: .85rem;
-    font-weight: 700;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-  }
-  .col-header.ip  { background: #2471a3; border-bottom: 3px solid #5b8fa8; }
-  .col-header.bl  { background: #c0392b; border-bottom: 3px solid #e57373; }
-  .col-header.qa  { background: #d68910; border-bottom: 3px solid #e8a838; }
-  .col-header.rfp { background: #1e8449; border-bottom: 3px solid #81c784; }
+  /* TICKET CARD */
+  .ticket-card { background: #1a2f3a; border-radius: 8px; padding: 0.75rem; border-left-width: 4px; border-left-style: solid; }
+  .ticket-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; flex-wrap: wrap; }
+  .ticket-key { color: #a8d0e6; font-size: 0.8rem; font-weight: 700; text-decoration: none; }
+  .ticket-key:hover { text-decoration: underline; }
+  .priority-badge { font-size: 0.65rem; font-weight: 700; padding: 0.15rem 0.45rem; border-radius: 10px; color: #fff; text-transform: uppercase; letter-spacing: 0.3px; }
+  .ticket-summary { font-size: 0.82rem; color: #c5d5e0; line-height: 1.4; margin-bottom: 0.5rem; }
+  .ticket-footer { display: flex; align-items: center; gap: 0.5rem; }
+  .assignee-name { font-size: 0.75rem; color: #8b9ba8; }
 
-  .col-body { display: flex; flex-direction: column; gap: .6rem; }
+  /* AVATAR */
+  .avatar { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; font-size: 0.65rem; font-weight: 800; color: #fff; flex-shrink: 0; }
+  .avatar-lg { width: 36px; height: 36px; font-size: 0.85rem; }
 
-  /* ── Ticket cards ── */
-  .card {
-    background: #2d4a5e;
-    border-radius: 8px;
-    padding: .75rem 1rem;
-    border-left: 3px solid transparent;
-    transition: transform .15s ease, box-shadow .15s ease;
-  }
-  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.3); }
-  .card.ip  { border-left-color: #5b8fa8; }
-  .card.bl  { border-left-color: #e57373; }
-  .card.qa  { border-left-color: #e8a838; }
-  .card.rfp { border-left-color: #81c784; }
+  /* EMPTY */
+  .empty-col { color: #8b9ba8; font-size: 0.85rem; text-align: center; padding: 1.5rem 0.5rem; line-height: 1.5; }
 
-  .card-top { display: flex; align-items: center; gap: .5rem; margin-bottom: .45rem; }
-  .card-key a {
-    color: #a8d0e6;
-    font-size: .78rem;
-    font-weight: 700;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    text-decoration: none;
-    letter-spacing: .02em;
-  }
-  .card-key a:hover { text-decoration: underline; }
-  .priority-badge {
-    font-size: .65rem;
-    font-weight: 700;
-    padding: .15rem .5rem;
-    border-radius: 999px;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-  }
-  .p-highest { background: rgba(198,40,40,.25); color: #ef9a9a; border: 1px solid #c62828; }
-  .p-high    { background: rgba(230,74,25,.22); color: #ffab91; border: 1px solid #e64a19; }
-  .p-medium  { background: rgba(80,80,80,.3);   color: #bdbdbd; border: 1px solid #555; }
-  .p-low     { background: rgba(56,142,60,.22); color: #a5d6a7; border: 1px solid #388e3c; }
+  /* WORKLOG SECTION */
+  .worklog-section { margin: 0 1.5rem 1.5rem; }
+  .worklog-section-header { background: #2e5944; border-radius: 10px 10px 0 0; padding: 0.9rem 1.25rem; }
+  .worklog-section-title { font-size: 1.05rem; font-weight: 700; color: #a8dbb8; }
+  .worklog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; background: #243d4f; border-radius: 0 0 10px 10px; padding: 1rem; }
+  .worklog-card { background: #1a2f3a; border-radius: 8px; overflow: hidden; border: 1px solid rgba(168,208,230,0.1); }
+  .worklog-person-header { display: flex; align-items: center; gap: 0.6rem; padding: 0.7rem 0.9rem; background: #2d4a5e; }
+  .worklog-person-name { font-weight: 700; font-size: 0.9rem; color: #e8f4fc; }
+  .worklog-entries { padding: 0.5rem; display: flex; flex-direction: column; gap: 0.4rem; }
+  .worklog-row { display: grid; grid-template-columns: 90px 1fr 55px; align-items: start; gap: 0.5rem; padding: 0.4rem 0.4rem; border-radius: 5px; background: #243d4f; }
+  .worklog-key { color: #a8d0e6; font-size: 0.75rem; font-weight: 700; text-decoration: none; white-space: nowrap; }
+  .worklog-key:hover { text-decoration: underline; }
+  .worklog-summary { font-size: 0.78rem; color: #b0c4d0; line-height: 1.35; }
+  .worklog-time { font-size: 0.78rem; font-weight: 700; color: #c9a86c; text-align: right; white-space: nowrap; }
 
-  .card-summary { font-size: .82rem; color: #c9dde8; line-height: 1.45; margin-bottom: .55rem; }
-
-  .assignee-row { display: flex; align-items: center; gap: .45rem; }
-  .avatar {
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: .62rem; font-weight: 700; color: #fff;
-    flex-shrink: 0;
-  }
-  .assignee-name { font-size: .74rem; color: #8b9ba8; }
-
-  /* ── Empty state ── */
-  .empty-state {
-    background: #2d4a5e;
-    border-radius: 8px;
-    padding: 1.5rem 1rem;
-    text-align: center;
-    color: #8b9ba8;
-    font-size: .85rem;
-    border: 1px dashed #3d6a7e;
-    font-style: italic;
-  }
-
-  /* ── Worklog section ── */
-  .worklog-section { margin-top: .5rem; }
-  .worklog-header {
-    background: #2e5944;
-    border-radius: 10px 10px 0 0;
-    padding: .85rem 1.25rem;
-    font-size: 1rem;
-    font-weight: 700;
-    color: #a8e6c4;
-    border-bottom: 2px solid #3d7a5e;
-  }
-  .worklog-body {
-    background: #263d30;
-    border-radius: 0 0 10px 10px;
-    padding: 1.25rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 1rem;
-  }
-  .worklog-card {
-    background: #2d4a5e;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid #3d5a6a;
-  }
-  .worklog-card-header {
-    display: flex;
-    align-items: center;
-    gap: .65rem;
-    padding: .7rem 1rem;
-    background: #233a47;
-    border-bottom: 1px solid #3d5a6a;
-  }
-  .worklog-avatar {
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: .78rem; font-weight: 700; color: #fff;
-    flex-shrink: 0;
-  }
-  .worklog-name { font-size: .88rem; font-weight: 600; color: #c9dde8; }
-  .worklog-entries { padding: .6rem 0; }
-  .worklog-row {
-    display: flex;
-    align-items: flex-start;
-    gap: .75rem;
-    padding: .45rem 1rem;
-    border-bottom: 1px solid rgba(255,255,255,.05);
-  }
-  .worklog-row:last-child { border-bottom: none; }
-  .worklog-key a {
-    color: #a8d0e6;
-    font-size: .74rem;
-    font-weight: 700;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    text-decoration: none;
-    white-space: nowrap;
-  }
-  .worklog-key a:hover { text-decoration: underline; }
-  .worklog-summary { font-size: .78rem; color: #9ab5c2; flex: 1; line-height: 1.4; }
-  .worklog-time {
-    font-size: .76rem;
-    font-weight: 700;
-    color: #c9a86c;
-    white-space: nowrap;
-    background: rgba(201,168,108,.12);
-    border: 1px solid rgba(201,168,108,.3);
-    border-radius: 999px;
-    padding: .15rem .55rem;
-    flex-shrink: 0;
-  }
-  .worklog-empty {
-    background: #263d30;
-    border-radius: 0 0 10px 10px;
-    padding: 1.5rem;
-    text-align: center;
-    color: #6b8b7a;
-    font-size: .9rem;
-    font-style: italic;
-  }
-
-  /* ── Footer ── */
-  footer {
-    text-align: center;
-    padding: 1.5rem 2rem;
-    color: #4a6a7a;
-    font-size: .75rem;
-    border-top: 1px solid #1e3a50;
-    margin-top: 1rem;
-  }
+  /* FOOTER */
+  .footer { text-align: center; padding: 1.5rem; color: #8b9ba8; font-size: 0.78rem; border-top: 1px solid rgba(168,208,230,0.1); margin-top: 0.5rem; }
 </style>
 </head>
 <body>
 
-<!-- ══════════ HERO ══════════ -->
-<div class="hero">
-  <div class="hero-text">
-    <h1>&#x26F0;&#xFE0F; Trail Status Dashboard</h1>
-    <div class="subtitle">Web Programs Development &middot; June 30, 2026 &middot; opentexthq.atlassian.net</div>
-    <div class="badge">&#x1F3D5;&#xFE0F; Current Sprint Only &middot; WPD</div>
-  </div>
-  <svg class="mountain-svg" viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+<header class="hero">
+  <h1>⛰️ Trail Status Dashboard</h1>
+  <div class="hero-sub">Web Programs Development &middot; June 30, 2026 &middot; opentexthq.atlassian.net</div>
+  <div class="hero-badge">🏕️ Current Sprint Only &middot; WPD</div>
+  <svg class="hero-mountains" viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M0,90 L80,60 L150,80 L250,30 L340,70 L420,20 L500,60 L580,40 L660,75 L740,10 L820,55 L900,35 L980,65 L1060,15 L1140,50 L1220,30 L1320,70 L1440,40 L1440,120 L0,120 Z" fill="#1a3a5c" opacity="0.6"/>
     <path d="M0,110 L60,85 L120,100 L200,60 L280,95 L380,50 L460,80 L520,65 L620,95 L700,40 L800,75 L880,55 L960,90 L1040,45 L1140,80 L1220,55 L1320,85 L1440,65 L1440,120 L0,120 Z" fill="#152535"/>
     <path d="M700,40 L720,18 L740,40 Z" fill="#fff" opacity="0.9"/>
   </svg>
-</div>
+</header>
 
-<!-- ══════════ STATS BAR ══════════ -->
 <div class="stats-bar">
-  <div class="stat-box ip">
-    <div class="stat-icon">&#x1F97E;</div>
+  <div class="stat-box">
+    <div class="stat-emoji">🥾</div>
     <div class="stat-count">20</div>
     <div class="stat-label">In Progress</div>
   </div>
-  <div class="stat-box bl">
-    <div class="stat-icon">&#x1FAA8;</div>
+  <div class="stat-box">
+    <div class="stat-emoji">🪨</div>
     <div class="stat-count">5</div>
     <div class="stat-label">Blocked</div>
   </div>
-  <div class="stat-box qa">
-    <div class="stat-icon">&#x1F52D;</div>
+  <div class="stat-box">
+    <div class="stat-emoji">🔭</div>
     <div class="stat-count">1</div>
     <div class="stat-label">QA In Progress</div>
   </div>
-  <div class="stat-box rfp">
-    <div class="stat-icon">&#x1F3D4;&#xFE0F;</div>
+  <div class="stat-box">
+    <div class="stat-emoji">🏔️</div>
     <div class="stat-count">0</div>
     <div class="stat-label">Ready for Prod</div>
   </div>
 </div>
 
-<!-- ══════════ MAIN ══════════ -->
-<div class="main">
-
-  <!-- ── 4-Column Board ── -->
-  <div class="board">
-
-    <!-- IN PROGRESS -->
-    <div class="column">
-      <div class="col-header ip">&#x1F97E; In Progress &mdash; 20</div>
-      <div class="col-body">
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4403" target="_blank">WPD-4403</a></div>
-            <span class="priority-badge p-highest">Highest</span>
-          </div>
-          <div class="card-summary">[FE] Dry Run of Launch</div>
-          <div class="assignee-row"><div class="avatar" style="background:#26a69a">CS</div><span class="assignee-name">Chris Schultz</span></div>
-        </div>
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4353" target="_blank">WPD-4353</a></div>
-            <span class="priority-badge p-highest">Highest</span>
-          </div>
-          <div class="card-summary">[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)</div>
-          <div class="assignee-row"><div class="avatar" style="background:#42a5f5">NK</div><span class="assignee-name">Nick Karch</span></div>
-        </div>
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4352" target="_blank">WPD-4352</a></div>
-            <span class="priority-badge p-highest">Highest</span>
-          </div>
-          <div class="card-summary">[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)</div>
-          <div class="assignee-row"><div class="avatar" style="background:#26a69a">CS</div><span class="assignee-name">Chris Schultz</span></div>
-        </div>
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4287" target="_blank">WPD-4287</a></div>
-            <span class="priority-badge p-highest">Highest</span>
-          </div>
-          <div class="card-summary">[BE] Evaluate Fix for longer translations</div>
-          <div class="assignee-row"><div class="avatar" style="background:#ab47bc">KK</div><span class="assignee-name">Krishna Kodicherla</span></div>
-        </div>
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3655" target="_blank">WPD-3655</a></div>
-            <span class="priority-badge p-highest">Highest</span>
-          </div>
-          <div class="card-summary">[FE] Global Font Change to accommodate for longer translations</div>
-          <div class="assignee-row"><div class="avatar" style="background:#42a5f5">NK</div><span class="assignee-name">Nick Karch</span></div>
-        </div>
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4364" target="_blank">WPD-4364</a></div>
-            <span class="priority-badge p-high">High</span>
-          </div>
-          <div class="card-summary">[CRITICAL] [QA Env] Blogs QA | Homepage - Issues in Performance, Accessibility, w3c validator scans</div>
-          <div class="assignee-row"><div class="avatar" style="background:#26a69a">CS</div><span class="assignee-name">Chris Schultz</span></div>
-        </div>
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4451" target="_blank">WPD-4451</a></div>
-            <span class="priority-badge p-high">High</span>
-          </div>
-          <div class="card-summary">[QA Env] Blogs | Database bloat is still higher than expected</div>
-          <div class="assignee-row"><div class="avatar" style="background:#26a69a">CS</div><span class="assignee-name">Chris Schultz</span></div>
-        </div>
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4359" target="_blank">WPD-4359</a></div>
-            <span class="priority-badge p-medium">Medium</span>
-          </div>
-          <div class="card-summary">Claude Sprint 78</div>
-          <div class="assignee-row"><div class="avatar" style="background:#5c6bc0">NR</div><span class="assignee-name">Nageswara Rao Recharla</span></div>
-        </div>
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4357" target="_blank">WPD-4357</a></div>
-            <span class="priority-badge p-medium">Medium</span>
-          </div>
-          <div class="card-summary">Claude Sprint 78</div>
-          <div class="assignee-row"><div class="avatar" style="background:#ef5350">GA</div><span class="assignee-name">Ganesh Abothula</span></div>
-        </div>
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4356" target="_blank">WPD-4356</a></div>
-            <span class="priority-badge p-medium">Medium</span>
-          </div>
-          <div class="card-summary">Claude Sprint 78</div>
-          <div class="assignee-row"><div class="avatar" style="background:#ff7043">LJ</div><span class="assignee-name">Lenin johnson</span></div>
-        </div>
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4346" target="_blank">WPD-4346</a></div>
-            <span class="priority-badge p-medium">Medium</span>
-          </div>
-          <div class="card-summary">[Prod] JP - Press Release filtering does not work for By Product category</div>
-          <div class="assignee-row"><div class="avatar" style="background:#ef5350">GA</div><span class="assignee-name">Ganesh Abothula</span></div>
-        </div>
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4360" target="_blank">WPD-4360</a></div>
-            <span class="priority-badge p-medium">Medium</span>
-          </div>
-          <div class="card-summary">Claude Sprint 78</div>
-          <div class="assignee-row"><div class="avatar" style="background:#66bb6a">SK</div><span class="assignee-name">Swetha Kalluri</span></div>
-        </div>
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4454" target="_blank">WPD-4454</a></div>
-            <span class="priority-badge p-medium">Medium</span>
-          </div>
-          <div class="card-summary">[QA Env] WPD4112_bug7 Filtering: Results of UI and LSCS query do not match</div>
-          <div class="assignee-row"><div class="avatar" style="background:#ab47bc">KK</div><span class="assignee-name">Krishna Kodicherla</span></div>
-        </div>
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4434" target="_blank">WPD-4434</a></div>
-            <span class="priority-badge p-medium">Medium</span>
-          </div>
-          <div class="card-summary">(ot.digital) Enablement production push</div>
-          <div class="assignee-row"><div class="avatar" style="background:#5c6bc0">NR</div><span class="assignee-name">Nageswara Rao Recharla</span></div>
-        </div>
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3963" target="_blank">WPD-3963</a></div>
-            <span class="priority-badge p-medium">Medium</span>
-          </div>
-          <div class="card-summary">[Dev QA] | solutions.ot.com | fr | homepage | iPhone | &ldquo;Contact Us&rdquo; mobile number field not optimized for 10-digit number</div>
-          <div class="assignee-row"><div class="avatar" style="background:#8d6e63">JA</div><span class="assignee-name">Jean Alexandre</span></div>
-        </div>
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4358" target="_blank">WPD-4358</a></div>
-            <span class="priority-badge p-medium">Medium</span>
-          </div>
-          <div class="card-summary">Claude Sprint 78</div>
-          <div class="assignee-row"><div class="avatar" style="background:#ab47bc">KK</div><span class="assignee-name">Krishna Kodicherla</span></div>
-        </div>
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3899" target="_blank">WPD-3899</a></div>
-            <span class="priority-badge p-medium">Medium</span>
-          </div>
-          <div class="card-summary">[FE][BP2] Apply new color and typography tokens to tooltip component</div>
-          <div class="assignee-row"><div class="avatar" style="background:#26a69a">CS</div><span class="assignee-name">Chris Schultz</span></div>
-        </div>
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3593" target="_blank">WPD-3593</a></div>
-            <span class="priority-badge p-medium">Medium</span>
-          </div>
-          <div class="card-summary">(Apps) Search results updates</div>
-          <div class="assignee-row"><div class="avatar" style="background:#ff7043">LJ</div><span class="assignee-name">Lenin johnson</span></div>
-        </div>
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4237" target="_blank">WPD-4237</a></div>
-            <span class="priority-badge p-medium">Medium</span>
-          </div>
-          <div class="card-summary">[Content] (C19 Update) Marquee on Homepage Blip Resolution</div>
-          <div class="assignee-row"><div class="avatar" style="background:#26c6da">JL</div><span class="assignee-name">Jenny Luke</span></div>
-        </div>
-
-        <div class="card ip">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4381" target="_blank">WPD-4381</a></div>
-            <span class="priority-badge p-medium">Medium</span>
-          </div>
-          <div class="card-summary">[FE] Social Share capability</div>
-          <div class="assignee-row"><div class="avatar" style="background:#26a69a">CS</div><span class="assignee-name">Chris Schultz</span></div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- BLOCKED -->
-    <div class="column">
-      <div class="col-header bl">&#x1FAA8; Blocked &mdash; 5</div>
-      <div class="col-body">
-
-        <div class="card bl">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4257" target="_blank">WPD-4257</a></div>
-            <span class="priority-badge p-highest">Highest</span>
-          </div>
-          <div class="card-summary">[WEB CMS] Create new skin for SaaS navigation</div>
-          <div class="assignee-row"><div class="avatar" style="background:#26c6da">JL</div><span class="assignee-name">Jenny Luke</span></div>
-        </div>
-
-        <div class="card bl">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4380" target="_blank">WPD-4380</a></div>
-            <span class="priority-badge p-high">High</span>
-          </div>
-          <div class="card-summary">Remove Analytics tag from Customer Story landing page filtering option</div>
-          <div class="assignee-row"><div class="avatar" style="background:#ab47bc">KK</div><span class="assignee-name">Krishna Kodicherla</span></div>
-        </div>
-
-        <div class="card bl">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-3902" target="_blank">WPD-3902</a></div>
-            <span class="priority-badge p-high">High</span>
-          </div>
-          <div class="card-summary">[FE] Dynamic Footer + Header</div>
-          <div class="assignee-row"><div class="avatar" style="background:#42a5f5">NK</div><span class="assignee-name">Nick Karch</span></div>
-        </div>
-
-        <div class="card bl">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4206" target="_blank">WPD-4206</a></div>
-            <span class="priority-badge p-high">High</span>
-          </div>
-          <div class="card-summary">[FE][BP2] Research for Prefixing tailwind classes</div>
-          <div class="assignee-row"><div class="avatar" style="background:#42a5f5">NK</div><span class="assignee-name">Nick Karch</span></div>
-        </div>
-
-        <div class="card bl">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4323" target="_blank">WPD-4323</a></div>
-            <span class="priority-badge p-medium">Medium</span>
-          </div>
-          <div class="card-summary">[DMTH] - changes to publish workflow</div>
-          <div class="assignee-row"><div class="avatar" style="background:#5c6bc0">SJ</div><span class="assignee-name">Srinivas Jayaram Rao</span></div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- QA IN PROGRESS -->
-    <div class="column">
-      <div class="col-header qa">&#x1F52D; QA In Progress &mdash; 1</div>
-      <div class="col-body">
-
-        <div class="card qa">
-          <div class="card-top">
-            <div class="card-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4111" target="_blank">WPD-4111</a></div>
-            <span class="priority-badge p-medium">Medium</span>
-          </div>
-          <div class="card-summary">[CS Datasource] Develop utility to auto-update feed JSON</div>
-          <div class="assignee-row"><div class="avatar" style="background:#5c6bc0">SJ</div><span class="assignee-name">Srinivas Jayaram Rao</span></div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- READY FOR PRODUCTION -->
-    <div class="column">
-      <div class="col-header rfp">&#x1F3D4;&#xFE0F; Ready for Prod &mdash; 0</div>
-      <div class="col-body">
-        <div class="empty-state">&#x1F328;&#xFE0F; The summit is clear. No tickets waiting for production.</div>
-      </div>
-    </div>
-
-  </div><!-- end .board -->
-
-  <!-- ══════════ WORKLOG SECTION ══════════ -->
-  <div class="worklog-section">
-    <div class="worklog-header">&#x1F332; Time Logged &mdash; Last Business Day &nbsp;&nbsp; Monday, Jun 29 2026</div>
-    <div class="worklog-body">
-
-      <!-- Ganesh Abothula -->
-      <div class="worklog-card">
-        <div class="worklog-card-header">
-          <div class="worklog-avatar" style="background:#ef5350">GA</div>
-          <div class="worklog-name">Ganesh Abothula</div>
-        </div>
-        <div class="worklog-entries">
-          <div class="worklog-row">
-            <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4346" target="_blank">WPD-4346</a></div>
-            <div class="worklog-summary">[Prod] JP - Press Release filtering does not work for By Product category</div>
-            <div class="worklog-time">2h</div>
-          </div>
-          <div class="worklog-row">
-            <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4466" target="_blank">WPD-4466</a></div>
-            <div class="worklog-summary">[QA Env] WPD4112_bug8 Generic, Partner, Ot trusts not displayed in Cards nor sorted via filter</div>
-            <div class="worklog-time">4h</div>
-          </div>
-          <div class="worklog-row">
-            <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4467" target="_blank">WPD-4467</a></div>
-            <div class="worklog-summary">[QA Env] WPD4112_bug9 Missing Reset button/hyperlink</div>
-            <div class="worklog-time">2h</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Patrick Galego -->
-      <div class="worklog-card">
-        <div class="worklog-card-header">
-          <div class="worklog-avatar" style="background:#26a69a">PG</div>
-          <div class="worklog-name">Patrick Galego</div>
-        </div>
-        <div class="worklog-entries">
-          <div class="worklog-row">
-            <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4445" target="_blank">WPD-4445</a></div>
-            <div class="worklog-summary">[UX] Review the 7 prototype pages and deliver UX recommendations (Due July 7th)</div>
-            <div class="worklog-time">6h</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Krishna Kodicherla -->
-      <div class="worklog-card">
-        <div class="worklog-card-header">
-          <div class="worklog-avatar" style="background:#ab47bc">KK</div>
-          <div class="worklog-name">Krishna Kodicherla</div>
-        </div>
-        <div class="worklog-entries">
-          <div class="worklog-row">
-            <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4454" target="_blank">WPD-4454</a></div>
-            <div class="worklog-summary">[QA Env] WPD4112_bug7 Filtering: Results of UI and LSCS query do not match</div>
-            <div class="worklog-time">4h</div>
-          </div>
-          <div class="worklog-row">
-            <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4454" target="_blank">WPD-4454</a></div>
-            <div class="worklog-summary">[QA Env] WPD4112_bug7 Filtering: Results of UI and LSCS query do not match</div>
-            <div class="worklog-time">4h</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Nick Karch -->
-      <div class="worklog-card">
-        <div class="worklog-card-header">
-          <div class="worklog-avatar" style="background:#42a5f5">NK</div>
-          <div class="worklog-name">Nick Karch</div>
-        </div>
-        <div class="worklog-entries">
-          <div class="worklog-row">
-            <div class="worklog-key"><a href="https://opentexthq.atlassian.net/browse/WPD-4353" target="_blank">WPD-4353</a></div>
-            <div class="worklog-summary">[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)</div>
-            <div class="worklog-time">7m</div>
-          </div>
-        </div>
-      </div>
-
-    </div>
+<div class="board">
+  <div class="board-column">
+  <div class="col-header" style="background:#2471a3">
+    <span class="col-title">🥾 In Progress</span>
+    <span class="col-count">20</span>
   </div>
+  <div class="col-body">
+    <div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4359" target="_blank">WPD-4359</a>
+    <span class="priority-badge" style="background:#546e7a">Medium</span>
+  </div>
+  <div class="ticket-summary">Claude Sprint 78</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#5c6bc0" title="Nageswara Rao Recharla">NR</span>
+    <span class="assignee-name">Nageswara Rao Recharla</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4403" target="_blank">WPD-4403</a>
+    <span class="priority-badge" style="background:#c62828">Highest</span>
+  </div>
+  <div class="ticket-summary">[FE] Dry Run of Launch</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#26a69a" title="Chris Schultz">CS</span>
+    <span class="assignee-name">Chris Schultz</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4357" target="_blank">WPD-4357</a>
+    <span class="priority-badge" style="background:#546e7a">Medium</span>
+  </div>
+  <div class="ticket-summary">Claude Sprint 78</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#ef5350" title="Ganesh Abothula">GA</span>
+    <span class="assignee-name">Ganesh Abothula</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4356" target="_blank">WPD-4356</a>
+    <span class="priority-badge" style="background:#546e7a">Medium</span>
+  </div>
+  <div class="ticket-summary">Claude Sprint 78</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#ff7043" title="Lenin johnson">LJ</span>
+    <span class="assignee-name">Lenin johnson</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4346" target="_blank">WPD-4346</a>
+    <span class="priority-badge" style="background:#546e7a">Medium</span>
+  </div>
+  <div class="ticket-summary">[Prod] JP - Press Release filtering does not work for By Product category</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#ef5350" title="Ganesh Abothula">GA</span>
+    <span class="assignee-name">Ganesh Abothula</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4360" target="_blank">WPD-4360</a>
+    <span class="priority-badge" style="background:#546e7a">Medium</span>
+  </div>
+  <div class="ticket-summary">Claude Sprint 78</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#66bb6a" title="Swetha Kalluri">SK</span>
+    <span class="assignee-name">Swetha Kalluri</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4353" target="_blank">WPD-4353</a>
+    <span class="priority-badge" style="background:#c62828">Highest</span>
+  </div>
+  <div class="ticket-summary">[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#42a5f5" title="Nick Karch">NK</span>
+    <span class="assignee-name">Nick Karch</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4454" target="_blank">WPD-4454</a>
+    <span class="priority-badge" style="background:#546e7a">Medium</span>
+  </div>
+  <div class="ticket-summary">[QA Env] WPD4112_bug7 Filtering: Results of UI and LSCS query do not match</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#ab47bc" title="Krishna Kodicherla">KK</span>
+    <span class="assignee-name">Krishna Kodicherla</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4364" target="_blank">WPD-4364</a>
+    <span class="priority-badge" style="background:#e64a19">High</span>
+  </div>
+  <div class="ticket-summary">[CRITICAL] [QA Env] Blogs QA | Homepage - Issues in Performance, Accessibility, w3c validator scans</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#26a69a" title="Chris Schultz">CS</span>
+    <span class="assignee-name">Chris Schultz</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4434" target="_blank">WPD-4434</a>
+    <span class="priority-badge" style="background:#546e7a">Medium</span>
+  </div>
+  <div class="ticket-summary">(ot.digital) Enablement production push</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#5c6bc0" title="Nageswara Rao Recharla">NR</span>
+    <span class="assignee-name">Nageswara Rao Recharla</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4287" target="_blank">WPD-4287</a>
+    <span class="priority-badge" style="background:#c62828">Highest</span>
+  </div>
+  <div class="ticket-summary">[BE] Evaluate Fix for longer translations</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#ab47bc" title="Krishna Kodicherla">KK</span>
+    <span class="assignee-name">Krishna Kodicherla</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4451" target="_blank">WPD-4451</a>
+    <span class="priority-badge" style="background:#e64a19">High</span>
+  </div>
+  <div class="ticket-summary">[QA Env] Blogs | Database bloat is still higher than expected</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#26a69a" title="Chris Schultz">CS</span>
+    <span class="assignee-name">Chris Schultz</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-3963" target="_blank">WPD-3963</a>
+    <span class="priority-badge" style="background:#546e7a">Medium</span>
+  </div>
+  <div class="ticket-summary">[Dev QA] | solutions.ot.com | fr | homepage - Contact Us form mobile number field not optimized</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#8d6e63" title="Jean Alexandre">JA</span>
+    <span class="assignee-name">Jean Alexandre</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4352" target="_blank">WPD-4352</a>
+    <span class="priority-badge" style="background:#c62828">Highest</span>
+  </div>
+  <div class="ticket-summary">[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#26a69a" title="Chris Schultz">CS</span>
+    <span class="assignee-name">Chris Schultz</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4358" target="_blank">WPD-4358</a>
+    <span class="priority-badge" style="background:#546e7a">Medium</span>
+  </div>
+  <div class="ticket-summary">Claude Sprint 78</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#ab47bc" title="Krishna Kodicherla">KK</span>
+    <span class="assignee-name">Krishna Kodicherla</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-3655" target="_blank">WPD-3655</a>
+    <span class="priority-badge" style="background:#c62828">Highest</span>
+  </div>
+  <div class="ticket-summary">[FE] Global Font Change to accommodate for longer translations</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#42a5f5" title="Nick Karch">NK</span>
+    <span class="assignee-name">Nick Karch</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-3899" target="_blank">WPD-3899</a>
+    <span class="priority-badge" style="background:#546e7a">Medium</span>
+  </div>
+  <div class="ticket-summary">[FE][BP2] Apply new color and typography tokens to tooltip component</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#26a69a" title="Chris Schultz">CS</span>
+    <span class="assignee-name">Chris Schultz</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-3593" target="_blank">WPD-3593</a>
+    <span class="priority-badge" style="background:#546e7a">Medium</span>
+  </div>
+  <div class="ticket-summary">(Apps) Search results updates</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#ff7043" title="Lenin johnson">LJ</span>
+    <span class="assignee-name">Lenin johnson</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4237" target="_blank">WPD-4237</a>
+    <span class="priority-badge" style="background:#546e7a">Medium</span>
+  </div>
+  <div class="ticket-summary">[Content] (C19 Update) Marquee on Homepage Blip Resolution</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#26c6da" title="Jenny Luke">JL</span>
+    <span class="assignee-name">Jenny Luke</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #5b8fa8">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4381" target="_blank">WPD-4381</a>
+    <span class="priority-badge" style="background:#546e7a">Medium</span>
+  </div>
+  <div class="ticket-summary">[FE] Social Share capability</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#26a69a" title="Chris Schultz">CS</span>
+    <span class="assignee-name">Chris Schultz</span>
+  </div>
+</div>
+  </div>
+</div>
+  <div class="board-column">
+  <div class="col-header" style="background:#c0392b">
+    <span class="col-title">🪨 Blocked</span>
+    <span class="col-count">5</span>
+  </div>
+  <div class="col-body">
+    <div class="ticket-card" style="border-left:4px solid #e57373">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4257" target="_blank">WPD-4257</a>
+    <span class="priority-badge" style="background:#c62828">Highest</span>
+  </div>
+  <div class="ticket-summary">[WEB CMS] Create new skin for SaaS navigation</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#26c6da" title="Jenny Luke">JL</span>
+    <span class="assignee-name">Jenny Luke</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #e57373">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4380" target="_blank">WPD-4380</a>
+    <span class="priority-badge" style="background:#e64a19">High</span>
+  </div>
+  <div class="ticket-summary">Remove Analytics tag from Customer Story landing page filtering option</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#ab47bc" title="Krishna Kodicherla">KK</span>
+    <span class="assignee-name">Krishna Kodicherla</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #e57373">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-3902" target="_blank">WPD-3902</a>
+    <span class="priority-badge" style="background:#e64a19">High</span>
+  </div>
+  <div class="ticket-summary">[FE] Dynamic Footer + Header</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#42a5f5" title="Nick Karch">NK</span>
+    <span class="assignee-name">Nick Karch</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #e57373">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4323" target="_blank">WPD-4323</a>
+    <span class="priority-badge" style="background:#546e7a">Medium</span>
+  </div>
+  <div class="ticket-summary">[DMTH] - changes to publish workflow</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#5c6bc0" title="Srinivas Jayaram Rao">SR</span>
+    <span class="assignee-name">Srinivas Jayaram Rao</span>
+  </div>
+</div>
+<div class="ticket-card" style="border-left:4px solid #e57373">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4206" target="_blank">WPD-4206</a>
+    <span class="priority-badge" style="background:#e64a19">High</span>
+  </div>
+  <div class="ticket-summary">[FE][BP2] Research for Prefixing tailwind classes</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#42a5f5" title="Nick Karch">NK</span>
+    <span class="assignee-name">Nick Karch</span>
+  </div>
+</div>
+  </div>
+</div>
+  <div class="board-column">
+  <div class="col-header" style="background:#d68910">
+    <span class="col-title">🔭 QA In Progress</span>
+    <span class="col-count">1</span>
+  </div>
+  <div class="col-body">
+    <div class="ticket-card" style="border-left:4px solid #e8a838">
+  <div class="ticket-header">
+    <a class="ticket-key" href="https://opentexthq.atlassian.net/browse/WPD-4111" target="_blank">WPD-4111</a>
+    <span class="priority-badge" style="background:#546e7a">Medium</span>
+  </div>
+  <div class="ticket-summary">[CS Datasource] Develop utility to auto-update feed JSON</div>
+  <div class="ticket-footer">
+    <span class="avatar" style="background:#5c6bc0" title="Srinivas Jayaram Rao">SR</span>
+    <span class="assignee-name">Srinivas Jayaram Rao</span>
+  </div>
+</div>
+  </div>
+</div>
+  <div class="board-column">
+  <div class="col-header" style="background:#1e8449">
+    <span class="col-title">🏔️ Ready for Production</span>
+    <span class="col-count">0</span>
+  </div>
+  <div class="col-body">
+    <div class="empty-col">🌨️ The summit is clear. No tickets waiting for production.</div>
+  </div>
+</div>
+</div>
 
-</div><!-- end .main -->
+<div class="worklog-section">
+  <div class="worklog-section-header">
+    <div class="worklog-section-title">🌲 Time Logged — Last Business Day (Monday, Jun 29, 2026)</div>
+  </div>
+  <div class="worklog-grid">
+    <div class="worklog-card">
+  <div class="worklog-person-header">
+    <span class="avatar avatar-lg" style="background:#5c6bc0">PG</span>
+    <span class="worklog-person-name">Patrick Galego</span>
+  </div>
+  <div class="worklog-entries"><div class="worklog-row">
+      <a class="worklog-key" href="https://opentexthq.atlassian.net/browse/WPD-4445" target="_blank">WPD-4445</a>
+      <span class="worklog-summary">[UX] Review the 7 prototype pages and deliver UX recommendations (Due July 7th)</span>
+      <span class="worklog-time">6h</span>
+    </div></div>
+</div><div class="worklog-card">
+  <div class="worklog-person-header">
+    <span class="avatar avatar-lg" style="background:#26a69a">GA</span>
+    <span class="worklog-person-name">Ganesh Abothula</span>
+  </div>
+  <div class="worklog-entries"><div class="worklog-row">
+      <a class="worklog-key" href="https://opentexthq.atlassian.net/browse/WPD-4346" target="_blank">WPD-4346</a>
+      <span class="worklog-summary">[Prod] JP - Press Release filtering does not work for By Product category</span>
+      <span class="worklog-time">2h</span>
+    </div><div class="worklog-row">
+      <a class="worklog-key" href="https://opentexthq.atlassian.net/browse/WPD-4466" target="_blank">WPD-4466</a>
+      <span class="worklog-summary">[QA Env] WPD4112_bug8 Generic, Partner, Ot trusts Ot not displayed in Cards nor is displayed when sorted via filter</span>
+      <span class="worklog-time">4h</span>
+    </div><div class="worklog-row">
+      <a class="worklog-key" href="https://opentexthq.atlassian.net/browse/WPD-4467" target="_blank">WPD-4467</a>
+      <span class="worklog-summary">[QA Env] WPD4112_bug9 Missing Reset button/hyperlink</span>
+      <span class="worklog-time">2h</span>
+    </div></div>
+</div><div class="worklog-card">
+  <div class="worklog-person-header">
+    <span class="avatar avatar-lg" style="background:#ef5350">NK</span>
+    <span class="worklog-person-name">Nick Karch</span>
+  </div>
+  <div class="worklog-entries"><div class="worklog-row">
+      <a class="worklog-key" href="https://opentexthq.atlassian.net/browse/WPD-4353" target="_blank">WPD-4353</a>
+      <span class="worklog-summary">[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)</span>
+      <span class="worklog-time">7m</span>
+    </div></div>
+</div><div class="worklog-card">
+  <div class="worklog-person-header">
+    <span class="avatar avatar-lg" style="background:#ff7043">KK</span>
+    <span class="worklog-person-name">Krishna Kodicherla</span>
+  </div>
+  <div class="worklog-entries"><div class="worklog-row">
+      <a class="worklog-key" href="https://opentexthq.atlassian.net/browse/WPD-4454" target="_blank">WPD-4454</a>
+      <span class="worklog-summary">[QA Env] WPD4112_bug7 Filtering: Results of UI and LSCS query do not match</span>
+      <span class="worklog-time">4h</span>
+    </div><div class="worklog-row">
+      <a class="worklog-key" href="https://opentexthq.atlassian.net/browse/WPD-4454" target="_blank">WPD-4454</a>
+      <span class="worklog-summary">[QA Env] WPD4112_bug7 Filtering: Results of UI and LSCS query do not match</span>
+      <span class="worklog-time">4h</span>
+    </div></div>
+</div>
+  </div>
+</div>
 
-<!-- ══════════ FOOTER ══════════ -->
-<footer>
-  &#x26F0;&#xFE0F; Trail Status Dashboard &middot; Current Sprint &middot; WPD &middot; Time logged: last business day (Mon Jun 29 2026) &middot; Generated 2026-06-30
+<footer class="footer">
+  ⛰️ Trail Status Dashboard &middot; Current Sprint &middot; WPD &middot; Time logged: last business day &middot; Generated 2026-06-30 (auto-refresh)
 </footer>
 
 </body>
