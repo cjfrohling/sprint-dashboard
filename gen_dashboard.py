@@ -22,63 +22,59 @@ def priority_color(p):
     return {'Highest':'#c62828','High':'#e64a19','Medium':'#455a64','Low':'#2e7d32'}.get(p,'#455a64')
 
 in_progress = [
-    {"key":"WPD-4454","summary":"[QA Env] WPD4112_bug7 Filtering: Results of UI and LSCS query do not match","assignee":"Krishna Kodicherla","priority":"Medium"},
-    {"key":"WPD-4451","summary":"[QA Env] Blogs | Database bloat is still higher than expected","assignee":"Chris Schultz","priority":"High"},
-    {"key":"WPD-4434","summary":"(ot.digital) Enablement production push","assignee":"Nageswara Rao Recharla","priority":"Medium"},
-    {"key":"WPD-4403","summary":"[FE] Dry Run of Launch","assignee":"Chris Schultz","priority":"Highest"},
-    {"key":"WPD-4381","summary":"[FE] Social Share capability ","assignee":"Chris Schultz","priority":"Medium"},
-    {"key":"WPD-4364","summary":"[CRITICAL] [QA Env] Blogs QA | Homepage - Issues in Performance, Accessibility, w3c validator scans","assignee":"Chris Schultz","priority":"High"},
-    {"key":"WPD-4360","summary":"Claude Sprint 78","assignee":"Swetha Kalluri","priority":"Medium"},
     {"key":"WPD-4359","summary":"Claude Sprint 78","assignee":"Nageswara Rao Recharla","priority":"Medium"},
-    {"key":"WPD-4358","summary":"Claude Sprint 78","assignee":"Krishna Kodicherla","priority":"Medium"},
+    {"key":"WPD-4403","summary":"[FE] Dry Run of Launch","assignee":"Chris Schultz","priority":"Highest"},
     {"key":"WPD-4357","summary":"Claude Sprint 78","assignee":"Ganesh Abothula","priority":"Medium"},
     {"key":"WPD-4356","summary":"Claude Sprint 78","assignee":"Lenin johnson","priority":"Medium"},
-    {"key":"WPD-4353","summary":"[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)","assignee":"Nick Karch","priority":"Highest"},
-    {"key":"WPD-4352","summary":"[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)","assignee":"Chris Schultz","priority":"Highest"},
     {"key":"WPD-4346","summary":"[Prod] JP - Press Release filtering does not work for By Product category","assignee":"Ganesh Abothula","priority":"Medium"},
+    {"key":"WPD-4360","summary":"Claude Sprint 78","assignee":"Swetha Kalluri","priority":"Medium"},
+    {"key":"WPD-4353","summary":"[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)","assignee":"Nick Karch","priority":"Highest"},
+    {"key":"WPD-4454","summary":"[QA Env] WPD4112_bug7 Filtering: Results of UI and LSCS query do not match","assignee":"Krishna Kodicherla","priority":"Medium"},
+    {"key":"WPD-4364","summary":"[CRITICAL] [QA Env] Blogs QA | Homepage - Issues in Performance, Accessibility, w3c validator scans","assignee":"Chris Schultz","priority":"High"},
+    {"key":"WPD-4434","summary":"(ot.digital) Enablement production push","assignee":"Nageswara Rao Recharla","priority":"Medium"},
     {"key":"WPD-4287","summary":"[BE] Evaluate Fix for longer translations","assignee":"Krishna Kodicherla","priority":"Highest"},
-    {"key":"WPD-4237","summary":"[Content] (C19 Update) Marquee on Homepage Blip Resolution","assignee":"Jenny Luke","priority":"Medium"},
+    {"key":"WPD-4451","summary":"[QA Env] Blogs | Database bloat is still higher than expected","assignee":"Chris Schultz","priority":"High"},
     {"key":"WPD-3963","summary":"[Dev QA] | solutions.ot.com | fr | homepage, information mgmt, predictive maintenance page | iPhone | In \"Contact Us\" form the mobile number field not optimized for 10-digit number","assignee":"Jean Alexandre","priority":"Medium"},
-    {"key":"WPD-3899","summary":"[FE][BP2] Apply new color and typography tokens to tooltip component ","assignee":"Chris Schultz","priority":"Medium"},
+    {"key":"WPD-4352","summary":"[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)","assignee":"Chris Schultz","priority":"Highest"},
+    {"key":"WPD-4358","summary":"Claude Sprint 78","assignee":"Krishna Kodicherla","priority":"Medium"},
     {"key":"WPD-3655","summary":"[FE] Global Font Change to accommodate for longer translations ","assignee":"Nick Karch","priority":"Highest"},
+    {"key":"WPD-3899","summary":"[FE][BP2] Apply new color and typography tokens to tooltip component ","assignee":"Chris Schultz","priority":"Medium"},
     {"key":"WPD-3593","summary":"(Apps) Search results updates","assignee":"Lenin johnson","priority":"Medium"},
+    {"key":"WPD-4237","summary":"[Content] (C19 Update) Marquee on Homepage Blip Resolution","assignee":"Jenny Luke","priority":"Medium"},
+    {"key":"WPD-4381","summary":"[FE] Social Share capability ","assignee":"Chris Schultz","priority":"Medium"},
 ]
 
 blocked = [
-    {"key":"WPD-4380","summary":"Remove Analytics tag from Customer Story landing page filtering option","assignee":"Krishna Kodicherla","priority":"High","block_reason":""},
-    {"key":"WPD-4323","summary":"[DMTH] - changes to publish workflow","assignee":"Srinivas Jayaram Rao","priority":"Medium","block_reason":""},
-    {"key":"WPD-4288","summary":"[WEB CMS] Customer Story DCR update script for logo revamp","assignee":"Krishna Kodicherla","priority":"Medium","block_reason":""},
     {"key":"WPD-4257","summary":"[WEB CMS] Create new skin for SaaS navigation ","assignee":"Jenny Luke","priority":"Highest","block_reason":""},
-    {"key":"WPD-4206","summary":"[FE][BP2] Research for Prefixing tailwind classes","assignee":"Nick Karch","priority":"High","block_reason":""},
-    {"key":"WPD-4194","summary":"[FE][BP2] Add avatar component ","assignee":"Chris Schultz","priority":"Medium","block_reason":""},
-    {"key":"WPD-4078","summary":"[WEB CMS] New C44.5 Variant ","assignee":"Ganesh Abothula","priority":"High","block_reason":""},
+    {"key":"WPD-4380","summary":"Remove Analytics tag from Customer Story landing page filtering option","assignee":"Krishna Kodicherla","priority":"High","block_reason":""},
+    {"key":"WPD-4288","summary":"[WEB CMS] Customer Story DCR update script for logo revamp","assignee":"Krishna Kodicherla","priority":"Medium","block_reason":""},
     {"key":"WPD-3902","summary":"[FE] Dynamic Footer + Header","assignee":"Nick Karch","priority":"High","block_reason":""},
-    {"key":"WPD-3564","summary":"[FE][BP2] Table Component","assignee":"Chris Schultz","priority":"Medium","block_reason":""},
+    {"key":"WPD-4078","summary":"[WEB CMS] New C44.5 Variant ","assignee":"Ganesh Abothula","priority":"High","block_reason":""},
+    {"key":"WPD-4323","summary":"[DMTH] - changes to publish workflow","assignee":"Srinivas Jayaram Rao","priority":"Medium","block_reason":""},
+    {"key":"WPD-4206","summary":"[FE][BP2] Research for Prefixing tailwind classes","assignee":"Nick Karch","priority":"High","block_reason":""},
 ]
 
 qa_in_progress = [
+    {"key":"WPD-4111","summary":"[CS Datasource] Develop utility to auto-update feed JSON","assignee":"Srinivas Jayaram Rao","priority":"Medium"},
 ]
 
 ready_for_production = [
 ]
 worklogs_by_author = {
-    "Lenin johnson": [
-        {"key":"WPD-4266","summary":"Getting to know Claude","timeSpent":"3h"},
-        {"key":"WPD-4266","summary":"Getting to know Claude","timeSpent":"1d 1h"},
-    ],
-    "Chris Schultz": [
-        {"key":"WPD-3564","summary":"[FE][BP2] Table Component","timeSpent":"2h"},
-        {"key":"WPD-4262","summary":"Getting to know Claude","timeSpent":"1h"},
-        {"key":"WPD-4194","summary":"[FE][BP2] Add avatar component","timeSpent":"1h 30m"},
+    "Ganesh Abothula": [
+        {"key":"WPD-4346","summary":"[Prod] JP - Press Release filtering does not work for By Product category","timeSpent":"2h"},
+        {"key":"WPD-4466","summary":"[QA Env] WPD4112_bug8 Generic, Partner, Ot trusts Ot not displayed in Cards nor is displayed when sorted via filter","timeSpent":"4h"},
+        {"key":"WPD-4467","summary":"[QA Env] WPD4112_bug9 Missing Reset button/hyperlink","timeSpent":"2h"},
     ],
     "Nick Karch": [
-        {"key":"WPD-3747","summary":"[FE] Update Language alert and gtm alert to work with BP2","timeSpent":"1d 30m"},
+        {"key":"WPD-4353","summary":"[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)","timeSpent":"7m"},
+    ],
+    "Krishna Kodicherla": [
+        {"key":"WPD-4454","summary":"[QA Env] WPD4112_bug7 Filtering: Results of UI and LSCS query do not match","timeSpent":"4h"},
+        {"key":"WPD-4454","summary":"[QA Env] WPD4112_bug7 Filtering: Results of UI and LSCS query do not match","timeSpent":"4h"},
     ],
     "Patrick Galego": [
-        {"key":"WPD-4274","summary":"Products Prototype","timeSpent":"4h"},
-    ],
-    "Ganesh Abothula": [
-        {"key":"WPD-4111","summary":"[CS Datasource] Develop utility to auto-update feed JSON","timeSpent":"1d"},
+        {"key":"WPD-4445","summary":"[UX] Review the 7 prototype pages and deliver UX recommendations (Due July 7th)","timeSpent":"6h"},
     ],
 }
 
@@ -157,7 +153,7 @@ if worklogs_by_author:
     wl_cards = "\n".join(worklog_person_html(a, e) for a, e in worklogs_by_author.items())
     worklog_body = f'        <div class="worklog-grid">\n{wl_cards}\n        </div>'
 else:
-    worklog_body = '        <div class="no-worklog">🌲 No time logged on Tuesday, Jun 02 2026.</div>'
+    worklog_body = '        <div class="no-worklog">🌲 No time logged on Monday, Jun 29 2026.</div>'
 
 now_str = subprocess.check_output(['date', '+%Y-%m-%d %H:%M MDT']).decode().strip()
 
@@ -336,7 +332,7 @@ html_out = f"""<!DOCTYPE html>
   <header class="hero">
     <div class="hero-content">
       <h1>&#x26F0;&#xFE0F; Trail Status Dashboard</h1>
-      <div class="subtitle">Web Programs Development &middot; June 29, 2026 &middot; opentexthq.atlassian.net</div>
+      <div class="subtitle">Web Programs Development &middot; June 30, 2026 &middot; opentexthq.atlassian.net</div>
       <span class="badge">&#x1F3D5;&#xFE0F; Current Sprint Only &middot; WPD</span>
     </div>
     <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
@@ -373,7 +369,7 @@ html_out = f"""<!DOCTYPE html>
 
   <!-- WORKLOG -->
   <div class="worklog-section">
-    <div class="worklog-header">&#x1F332; Time Logged &mdash; Last Business Day &nbsp;&#x1F4C5; Tuesday, Jun 02 2026</div>
+    <div class="worklog-header">&#x1F332; Time Logged &mdash; Last Business Day &nbsp;&#x1F4C5; Monday, Jun 29 2026</div>
     <div class="worklog-body">
 {worklog_body}
     </div>
