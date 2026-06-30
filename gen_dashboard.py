@@ -22,17 +22,20 @@ def priority_color(p):
     return {'Highest':'#c62828','High':'#e64a19','Medium':'#455a64','Low':'#2e7d32'}.get(p,'#455a64')
 
 in_progress = [
+    {"key":"WPD-4454","summary":"[QA Env] WPD4112_bug7 Filtering: Results of UI and LSCS query do not match","assignee":"Krishna Kodicherla","priority":"Medium"},
     {"key":"WPD-4451","summary":"[QA Env] Blogs | Database bloat is still higher than expected","assignee":"Chris Schultz","priority":"High"},
     {"key":"WPD-4434","summary":"(ot.digital) Enablement production push","assignee":"Nageswara Rao Recharla","priority":"Medium"},
     {"key":"WPD-4403","summary":"[FE] Dry Run of Launch","assignee":"Chris Schultz","priority":"Highest"},
     {"key":"WPD-4381","summary":"[FE] Social Share capability ","assignee":"Chris Schultz","priority":"Medium"},
-    {"key":"WPD-4364","summary":"[CRITICAL] [QA Env] Blogs QA | Homepage - Issues in Performance, Accessibility, w3c validator scans","assignee":"Unassigned","priority":"High"},
+    {"key":"WPD-4364","summary":"[CRITICAL] [QA Env] Blogs QA | Homepage - Issues in Performance, Accessibility, w3c validator scans","assignee":"Chris Schultz","priority":"High"},
+    {"key":"WPD-4360","summary":"Claude Sprint 78","assignee":"Swetha Kalluri","priority":"Medium"},
     {"key":"WPD-4359","summary":"Claude Sprint 78","assignee":"Nageswara Rao Recharla","priority":"Medium"},
     {"key":"WPD-4358","summary":"Claude Sprint 78","assignee":"Krishna Kodicherla","priority":"Medium"},
     {"key":"WPD-4357","summary":"Claude Sprint 78","assignee":"Ganesh Abothula","priority":"Medium"},
     {"key":"WPD-4356","summary":"Claude Sprint 78","assignee":"Lenin johnson","priority":"Medium"},
     {"key":"WPD-4353","summary":"[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)","assignee":"Nick Karch","priority":"Highest"},
     {"key":"WPD-4352","summary":"[FE] Component Distribution Approach with AI (Claude) (Due July 3rd)","assignee":"Chris Schultz","priority":"Highest"},
+    {"key":"WPD-4346","summary":"[Prod] JP - Press Release filtering does not work for By Product category","assignee":"Ganesh Abothula","priority":"Medium"},
     {"key":"WPD-4287","summary":"[BE] Evaluate Fix for longer translations","assignee":"Krishna Kodicherla","priority":"Highest"},
     {"key":"WPD-4237","summary":"[Content] (C19 Update) Marquee on Homepage Blip Resolution","assignee":"Jenny Luke","priority":"Medium"},
     {"key":"WPD-3963","summary":"[Dev QA] | solutions.ot.com | fr | homepage, information mgmt, predictive maintenance page | iPhone | In \"Contact Us\" form the mobile number field not optimized for 10-digit number","assignee":"Jean Alexandre","priority":"Medium"},
